@@ -56,18 +56,37 @@ export function StoryPlayer({ book }: { book: Book }) {
 
   const scenes = useMemo(() => buildScenes(book.pages, timestampMap), [book.pages, timestampMap])
 
-  const [sceneIdx, setSceneIdx]     = useState(0)
-  const [isPlaying, setIsPlaying]   = useState(true)
-  const [audioError, setAudioError] = useState(false)
-  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [sceneIdx, setSceneIdx]       = useState(0)
+  const [isPlaying, setIsPlaying]     = useState(true)
+  const [audioError, setAudioError]   = useState(false)
+  const [touchStart, setTouchStart]   = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration]       = useState(0)
+  const [bgColor, setBgColor]         = useState("#1a1208")
 
-  const audioRef    = useRef<HTMLAudioElement | null>(null)
-  const progressRef = useRef<HTMLDivElement | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const current = scenes[sceneIdx] ?? scenes[0]
   const total   = scenes.length
+
+  /* ── Couleur de fond dynamique via fast-average-color ── */
+  useEffect(() => {
+    if (!current?.image) return
+    let cancelled = false
+    import("fast-average-color").then(({ FastAverageColor }) => {
+      const fac = new FastAverageColor()
+      fac.getColorAsync(current.image, { algorithm: "dominant", crossOrigin: "anonymous" })
+        .then(color => {
+          if (cancelled) return
+          const [r, g, b] = color.value
+          setBgColor(
+            `rgb(${Math.round(r * 0.3)}, ${Math.round(g * 0.3)}, ${Math.round(b * 0.3)})`
+          )
+        })
+        .catch(() => { if (!cancelled) setBgColor("#1a1208") })
+    })
+    return () => { cancelled = true }
+  }, [current?.image])
 
   /* ── Navigation ── */
   const goTo = useCallback((idx: number) => {
@@ -146,13 +165,13 @@ export function StoryPlayer({ book }: { book: Book }) {
     setTouchStart(null)
   }
 
-  /* ── Progress bar scrub ── */
+  /* ── Progress scrub ── */
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioRef.current || !duration) return
     const rect = e.currentTarget.getBoundingClientRect()
-    const ratio = (e.clientX - rect.left) / rect.width
-    audioRef.current.currentTime = ratio * duration
-    setCurrentTime(ratio * duration)
+    const t = ((e.clientX - rect.left) / rect.width) * duration
+    audioRef.current.currentTime = t
+    setCurrentTime(t)
   }
 
   const togglePlay = () => { if (current?.audioSrc) setIsPlaying(p => !p) }
@@ -175,71 +194,74 @@ export function StoryPlayer({ book }: { book: Book }) {
       : -1
   }, [current, currentTime, duration, words.length])
 
-  /* ── Progress ratio ── */
-  const progressRatio = duration > 0 ? currentTime / duration : sceneIdx / Math.max(total - 1, 1)
+  const progressRatio = duration > 0 ? currentTime / duration : 0
   const displayImage  = current?.image || book.cover
 
-  /* ═════════════════════════════════════════════════════════
+  /* ════════════════════════════════════════════════════════
      RENDER
-  ═════════════════════════════════════════════════════════ */
+  ════════════════════════════════════════════════════════ */
   return (
     <div
       className="fixed inset-0 flex flex-col"
-      style={{ background: "#1a1208", overflow: "hidden" }}
+      style={{
+        background: bgColor,
+        transition: "background 0.8s ease",
+        overflow: "hidden",
+      }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       <audio ref={audioRef} preload="auto" />
 
       {/* ── HEADER transparent ── */}
-      <div
-        style={{
-          display: "flex", alignItems: "center", gap: 12,
-          padding: "52px 20px 12px",
-          flexShrink: 0,
-        }}
-      >
-        <Link
-          href="/#bibliotheque"
-          aria-label="Retour"
-          style={{
-            width: 32, height: 32, borderRadius: "50%",
-            background: "rgba(255,255,255,0.12)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "white", textDecoration: "none", fontSize: 16, flexShrink: 0,
-          }}
-        >
-          ←
-        </Link>
-        <div style={{ flex: 1, textAlign: "center", minWidth: 0 }}>
-          <p style={{
-            margin: 0, fontSize: 15, fontWeight: 700, color: "white",
-            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-            fontFamily: "var(--font-serif, Georgia, serif)",
-          }}>
-            {book.title}
-          </p>
-        </div>
+      <div style={{
+        display: "flex", alignItems: "center", gap: 12,
+        padding: "52px 20px 10px",
+        flexShrink: 0,
+      }}>
+        <Link href="/#bibliotheque" aria-label="Retour" style={{
+          width: 32, height: 32, borderRadius: "50%",
+          background: "rgba(255,255,255,0.12)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "white", textDecoration: "none", fontSize: 16, flexShrink: 0,
+        }}>←</Link>
+
+        <p style={{
+          flex: 1, margin: 0, textAlign: "center",
+          fontSize: 15, fontWeight: 700, color: "white",
+          fontFamily: "var(--font-serif, Georgia, serif)",
+          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+        }}>{book.title}</p>
+
         <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>
           {sceneIdx + 1} / {total}
         </span>
       </div>
 
-      {/* ── IMAGE — centrée, border-radius, shadow ── */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 20px", minHeight: 0 }}>
-        <div
-          style={{
-            width: "100%",
-            aspectRatio: "3 / 4",
-            maxHeight: "100%",
-            borderRadius: 16,
-            overflow: "hidden",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.55)",
-            position: "relative",
-            flexShrink: 0,
-          }}
-          onClick={togglePlay}
-        >
+      {/* ── IMAGE — domine l'écran, 1:1, marges 16px, ombre profonde ── */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "8px 16px",
+        minHeight: 0,
+      }}>
+        <div style={{
+          width: "100%",
+          aspectRatio: "1 / 1",
+          maxHeight: "100%",
+          borderRadius: 20,
+          overflow: "hidden",
+          position: "relative",
+          /* Ombre profonde — effet "flottant" Apple */
+          boxShadow: `
+            0 24px 60px rgba(0,0,0,0.65),
+            0 8px 20px rgba(0,0,0,0.45),
+            0 2px 6px rgba(0,0,0,0.3)
+          `,
+          flexShrink: 0,
+        }}>
           {displayImage && (
             <Image
               key={displayImage}
@@ -250,45 +272,30 @@ export function StoryPlayer({ book }: { book: Book }) {
               priority
             />
           )}
-          {/* Overlay play/pause au tap */}
-          {!isPlaying && current?.audioSrc && (
-            <div style={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: "rgba(0,0,0,0.25)",
-            }}>
-              <div style={{
-                width: 64, height: 64, borderRadius: "50%",
-                background: "rgba(200,160,64,0.9)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 26,
-              }}>▶</div>
-            </div>
-          )}
+          {/* Aucun overlay — le bouton en bas gère play/pause */}
         </div>
       </div>
 
-      {/* ── ZONE TEXTE — sous l'image, transparent ── */}
-      <div
-        style={{
-          height: 80, minHeight: 80, maxHeight: 80,
-          overflow: "hidden",
-          padding: "8px 24px 0",
-          flexShrink: 0,
-        }}
-      >
+      {/* ── ZONE TEXTE — 72px, transparent, karaoke ── */}
+      <div style={{
+        height: 72, minHeight: 72, maxHeight: 72,
+        overflow: "hidden",
+        padding: "6px 24px 0",
+        flexShrink: 0,
+      }}>
         {words.length > 0 && (
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, fontFamily: "var(--font-serif, Georgia, serif)", color: "rgba(255,255,255,0.85)" }}>
+          <p style={{
+            margin: 0, fontSize: 15, lineHeight: 1.6,
+            fontFamily: "var(--font-serif, Georgia, serif)",
+            color: "rgba(255,255,255,0.85)",
+          }}>
             {words.map((word, i) => (
-              <span
-                key={i}
-                style={{
-                  color: i === currentWordIdx ? "#c8a040" : "rgba(255,255,255,0.85)",
-                  fontWeight: i === currentWordIdx ? 700 : 400,
-                  textShadow: i === currentWordIdx ? "0 0 12px rgba(200,160,64,0.6)" : "none",
-                  transition: "color 0.12s ease",
-                }}
-              >
+              <span key={i} style={{
+                color: i === currentWordIdx ? "#c8a040" : "rgba(255,255,255,0.85)",
+                fontWeight: i === currentWordIdx ? 700 : 400,
+                textShadow: i === currentWordIdx ? "0 0 12px rgba(200,160,64,0.6)" : "none",
+                transition: "color 0.12s ease",
+              }}>
                 {word}{" "}
               </span>
             ))}
@@ -302,102 +309,79 @@ export function StoryPlayer({ book }: { book: Book }) {
       </div>
 
       {/* ── BARRE DE PROGRESSION — scrubable ── */}
-      <div style={{ padding: "12px 24px 4px", flexShrink: 0 }}>
-        <div
-          ref={progressRef}
-          onClick={handleProgressClick}
-          style={{
-            height: 3, borderRadius: 2,
-            background: "rgba(255,255,255,0.2)",
-            cursor: "pointer", position: "relative",
-          }}
-        >
+      <div style={{ padding: "10px 24px 2px", flexShrink: 0 }}>
+        <div onClick={handleProgressClick} style={{
+          height: 3, borderRadius: 2,
+          background: "rgba(255,255,255,0.18)",
+          cursor: "pointer", position: "relative",
+        }}>
           <div style={{
             position: "absolute", left: 0, top: 0, bottom: 0,
             width: `${progressRatio * 100}%`,
-            background: "#c8a040",
-            borderRadius: 2,
+            background: "#c8a040", borderRadius: 2,
             transition: "width 0.1s linear",
           }} />
-          {/* Thumb */}
           <div style={{
             position: "absolute", top: "50%",
             left: `${progressRatio * 100}%`,
             transform: "translate(-50%, -50%)",
-            width: 12, height: 12, borderRadius: "50%",
+            width: 11, height: 11, borderRadius: "50%",
             background: "#c8a040",
-            boxShadow: "0 0 6px rgba(200,160,64,0.6)",
+            boxShadow: "0 0 8px rgba(200,160,64,0.7)",
           }} />
         </div>
-        {/* Timestamps textuels */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
-            {formatTime(currentTime)}
-          </span>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5 }}>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{formatTime(currentTime)}</span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
             {duration > 0 ? `-${formatTime(duration - currentTime)}` : ""}
           </span>
         </div>
       </div>
 
-      {/* ── CONTRÔLES ── */}
-      <div
-        style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "8px 40px 40px",
-          flexShrink: 0,
-        }}
-      >
-        <button
-          onClick={prevScene}
-          disabled={sceneIdx === 0}
-          aria-label="Précédent"
-          style={{
-            width: 48, height: 48, borderRadius: "50%",
-            background: "transparent", border: "none",
-            cursor: sceneIdx === 0 ? "default" : "pointer",
-            opacity: sceneIdx === 0 ? 0.3 : 1,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 22, color: "white",
-          }}
-        >⏮</button>
+      {/* ── CONTRÔLES — hiérarchie visuelle claire ── */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "10px 52px 44px",
+        flexShrink: 0,
+      }}>
+        {/* ⏮ — petit, muted */}
+        <button onClick={prevScene} disabled={sceneIdx === 0} aria-label="Précédent" style={{
+          width: 36, height: 36,
+          background: "transparent", border: "none",
+          cursor: sceneIdx === 0 ? "default" : "pointer",
+          opacity: sceneIdx === 0 ? 0.25 : 0.65,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, color: "white",
+        }}>⏮</button>
 
-        <button
-          onClick={togglePlay}
-          disabled={!current?.audioSrc}
-          aria-label={isPlaying ? "Pause" : "Lecture"}
-          style={{
-            width: 64, height: 64, borderRadius: "50%",
-            background: current?.audioSrc ? "#c8a040" : "rgba(255,255,255,0.15)",
-            boxShadow: current?.audioSrc ? "0 4px 24px rgba(200,160,64,0.5)" : "none",
-            border: "none",
-            cursor: current?.audioSrc ? "pointer" : "default",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 24, color: current?.audioSrc ? "#1a1208" : "rgba(255,255,255,0.4)",
-          }}
-        >
+        {/* ▶/⏸ — dominant, doré, 64px */}
+        <button onClick={togglePlay} disabled={!current?.audioSrc} aria-label={isPlaying ? "Pause" : "Lecture"} style={{
+          width: 64, height: 64, borderRadius: "50%",
+          background: current?.audioSrc ? "#c8a040" : "rgba(255,255,255,0.12)",
+          boxShadow: current?.audioSrc ? "0 4px 28px rgba(200,160,64,0.55)" : "none",
+          border: "none",
+          cursor: current?.audioSrc ? "pointer" : "default",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 24,
+          color: current?.audioSrc ? "#1a1208" : "rgba(255,255,255,0.3)",
+        }}>
           {isPlaying ? "⏸" : "▶"}
         </button>
 
-        <button
-          onClick={nextScene}
-          disabled={sceneIdx === total - 1}
-          aria-label="Suivant"
-          style={{
-            width: 48, height: 48, borderRadius: "50%",
-            background: "transparent", border: "none",
-            cursor: sceneIdx === total - 1 ? "default" : "pointer",
-            opacity: sceneIdx === total - 1 ? 0.3 : 1,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 22, color: "white",
-          }}
-        >⏭</button>
+        {/* ⏭ — petit, muted */}
+        <button onClick={nextScene} disabled={sceneIdx === total - 1} aria-label="Suivant" style={{
+          width: 36, height: 36,
+          background: "transparent", border: "none",
+          cursor: sceneIdx === total - 1 ? "default" : "pointer",
+          opacity: sceneIdx === total - 1 ? 0.25 : 0.65,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, color: "white",
+        }}>⏭</button>
       </div>
     </div>
   )
 }
 
-/* ── Utilitaire : formatage MM:SS ── */
 function formatTime(sec: number): string {
   if (!sec || isNaN(sec)) return "0:00"
   const m = Math.floor(sec / 60)
