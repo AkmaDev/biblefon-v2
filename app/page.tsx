@@ -1,32 +1,13 @@
 import Image from "next/image"
-import Link from "next/link"
 import { BookGrid } from "@/components/library/BookGrid"
 import { ScrollChevron } from "@/components/ui/ScrollChevron"
+import { Navbar } from "@/components/ui/Navbar"
 
 export default function HomePage() {
   return (
     <main className="min-h-screen" style={{ background: "var(--background)" }}>
 
-      {/* ── Nav ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-        style={{ background: "linear-gradient(to bottom, rgba(8,6,4,0.7) 0%, transparent 100%)" }}>
-        <div className="flex flex-col">
-          <span className="font-bold text-white text-base leading-tight" style={{ fontFamily: "var(--font-serif)" }}>
-            BibleFon
-          </span>
-          <span className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
-            style={{ color: "var(--gold-light)", opacity: 0.8 }}>
-            Audio · Illustré · En Langue Fon
-          </span>
-        </div>
-        <Link
-          href="/about"
-          className="text-sm px-4 py-1.5 rounded-full transition-all duration-200
-            hover:text-white text-white/60 border border-white/10 hover:border-white/25"
-        >
-          À propos
-        </Link>
-      </nav>
+      <Navbar />
 
       {/* ── Hero ── */}
       <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden px-4">

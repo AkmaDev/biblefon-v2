@@ -58,21 +58,6 @@ export function BookCard({ book, index }: BookCardProps) {
           {book.testament === "ancien" ? "Ancien Testament" : "Nouveau Testament"}
         </div>
 
-        {/* ▶ Play button — toujours visible au centre */}
-        {!book.comingSoon && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div
-              className="flex items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110"
-              style={{
-                width: 72, height: 72,
-                background: `linear-gradient(135deg, ${book.accentColor}, ${book.accentColor}cc)`,
-                boxShadow: `0 8px 32px ${book.accentColor}88`,
-              }}
-            >
-              <span style={{ fontSize: 28, marginLeft: 5 }}>▶</span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Infos sous l'image ── */}
