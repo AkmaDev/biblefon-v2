@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { BookGrid } from "@/components/library/BookGrid"
+import { ScrollChevron } from "@/components/ui/ScrollChevron"
 
 export default function HomePage() {
   return (
@@ -58,10 +59,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
-          <div className="w-px h-8 bg-white/50" />
-        </div>
+        <ScrollChevron />
       </section>
 
       {/* ── Book grid ── */}
