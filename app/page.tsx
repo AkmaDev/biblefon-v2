@@ -33,7 +33,7 @@ export default function HomePage() {
         {/* Background image with overlay */}
         <div className="absolute inset-0">
           <Image
-            src="/pageaccueil.png"
+            src="/hero.jpg"
             alt="BibleFon"
             fill
             className="object-cover"
