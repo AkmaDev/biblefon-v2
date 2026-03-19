@@ -1,6 +1,7 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Lora, Inter } from "next/font/google"
 import "./globals.css"
+import { PwaRegistrar } from "./_components/PwaRegistrar"
 
 const inter = Inter({
   variable: "--font-sans",
@@ -14,15 +15,27 @@ const lora = Lora({
   display: "swap",
 })
 
+export const viewport: Viewport = {
+  themeColor: "#c9922a",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+}
+
 export const metadata: Metadata = {
   title: "BibleFon — Histoires Bibliques en Langue Fon",
   description:
     "Des histoires bibliques illustrées, lues et écoutées en langue fon pour les enfants et les familles.",
   keywords: ["Bible", "Fon", "Bénin", "histoires pour enfants", "langue fon", "audio"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "BibleFon",
+  },
   icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/logo.svg" }],
   },
   openGraph: {
     title: "BibleFon",
@@ -37,7 +50,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr-BJ" className={`${inter.variable} ${lora.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <PwaRegistrar />
+        {children}
+      </body>
     </html>
   )
 }

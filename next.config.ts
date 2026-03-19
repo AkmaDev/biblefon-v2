@@ -3,18 +3,20 @@
 
 const cspHeader = [
   "default-src 'self'",
-  // CDN scripts (jQuery + Turn.js) — integrity checked via SRI
-  "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
+  // Scripts locaux (Service Worker inclus)
+  "script-src 'self' 'unsafe-inline'",
   // Inline styles nécessaires (nombreux objets style JSX)
   "style-src 'self' 'unsafe-inline'",
   // Images locales + Pexels/Unsplash + blobs SVG
   "img-src 'self' data: blob: https://images.pexels.com https://images.unsplash.com",
-  // Blobs audio (TTS)
+  // Blobs audio (TTS) + audio local
   "media-src 'self' blob:",
-  // API HuggingFace pour TTS
+  // API HuggingFace pour TTS + SW fetch
   "connect-src 'self' https://api-inference.huggingface.co",
   // Polices Google Fonts chargées localement par Next.js
   "font-src 'self' data:",
+  // Service Workers depuis la même origine
+  "worker-src 'self'",
   // Pas d'embedding dans une iframe externe
   "frame-ancestors 'none'",
   // Empêche les injections de base URL
@@ -40,6 +42,20 @@ const nextConfig: import('next').NextConfig = {
           { key: "X-Content-Type-Options",    value: "nosniff" },
           { key: "Referrer-Policy",           value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy",        value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+      // Cache long pour les fichiers audio (immutables une fois produits)
+      {
+        source: "/audio/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Cache long pour les illustrations
+      {
+        source: "/illustrations/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
     ]
