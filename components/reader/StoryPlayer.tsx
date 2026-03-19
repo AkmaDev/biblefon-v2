@@ -188,69 +188,66 @@ export function StoryPlayer({ book }: { book: Book }) {
   const displayImage = current.image || book.cover
 
   /* ═══════════════════════════════════════════════════════════
-     RENDER — iOS splash
-  ═══════════════════════════════════════════════════════════*/
-  if (!iosUnlocked) {
-    return (
-      <div
-        className="fixed inset-0 flex flex-col items-center justify-center"
-        style={{ background: "#0a0f1a", cursor: "pointer" }}
-        onClick={handleIosUnlock}
-      >
-        {/* Cover en fond */}
-        <div className="absolute inset-0 opacity-30">
-          <Image src={book.cover} alt={book.title} fill className="object-cover" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, #0a0f1a 0%, transparent 40%, #0a0f1a 100%)" }} />
-        </div>
-
-        <div className="relative z-10 flex flex-col items-center gap-8 px-8 text-center">
-          {/* Titre */}
-          <div>
-            <p className="text-sm font-medium mb-2" style={{ color: book.accentColor }}>{book.titleFon}</p>
-            <h1 className="text-3xl font-bold text-white">{book.title}</h1>
-          </div>
-
-          {/* Bouton play */}
-          <button
-            className="flex flex-col items-center gap-3"
-            aria-label="Démarrer l'histoire"
-          >
-            <div
-              className="flex items-center justify-center rounded-full"
-              style={{
-                width: 80, height: 80,
-                background: `linear-gradient(135deg, ${book.accentColor}, ${book.accentColor}99)`,
-                boxShadow: `0 0 40px ${book.accentColor}66`,
-              }}
-            >
-              <span style={{ fontSize: 32, marginLeft: 6 }}>▶</span>
-            </div>
-            <span className="text-sm font-semibold text-white/70">Appuie pour écouter</span>
-          </button>
-
-          {/* Info */}
-          <div className="flex items-center gap-4 text-xs text-white/40">
-            <span>{book.readingTime}</span>
-            <span>·</span>
-            <span>{book.ageRange}</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     RENDER — Player principal
+     RENDER
   ═══════════════════════════════════════════════════════════*/
   return (
+    <>
+      {/* Audio toujours monté pour que audioRef soit disponible dès le splash */}
+      <audio ref={audioRef} preload="auto" />
+
+      {/* ── Splash iOS ── */}
+      {!iosUnlocked && (
+        <div
+          className="fixed inset-0 flex flex-col items-center justify-center"
+          style={{ background: "#0a0f1a", cursor: "pointer", zIndex: 50 }}
+          onClick={handleIosUnlock}
+        >
+          {/* Cover en fond */}
+          <div className="absolute inset-0 opacity-30">
+            <Image src={book.cover} alt={book.title} fill className="object-cover" />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, #0a0f1a 0%, transparent 40%, #0a0f1a 100%)" }} />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center gap-8 px-8 text-center">
+            {/* Titre */}
+            <div>
+              <p className="text-sm font-medium mb-2" style={{ color: book.accentColor }}>{book.titleFon}</p>
+              <h1 className="text-3xl font-bold text-white">{book.title}</h1>
+            </div>
+
+            {/* Bouton play */}
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className="flex items-center justify-center rounded-full"
+                style={{
+                  width: 80, height: 80,
+                  background: `linear-gradient(135deg, ${book.accentColor}, ${book.accentColor}99)`,
+                  boxShadow: `0 0 40px ${book.accentColor}66`,
+                }}
+              >
+                <span style={{ fontSize: 32, marginLeft: 6 }}>▶</span>
+              </div>
+              <span className="text-sm font-semibold text-white/70">Appuie pour écouter</span>
+            </div>
+
+            {/* Info */}
+            <div className="flex items-center gap-4 text-xs text-white/40">
+              <span>{book.readingTime}</span>
+              <span>·</span>
+              <span>{book.ageRange}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Player principal ── */}
+      {iosUnlocked && (
     <div
       className="fixed inset-0 flex flex-col"
       style={{ background: "#000", touchAction: "pan-y" }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {/* ── Audio element (invisible) ── */}
-      <audio ref={audioRef} preload="auto" />
 
       {/* ── Image de fond ── */}
       <div className="absolute inset-0">
@@ -413,5 +410,7 @@ export function StoryPlayer({ book }: { book: Book }) {
         </div>
       </div>
     </div>
+      )}
+    </>
   )
 }
