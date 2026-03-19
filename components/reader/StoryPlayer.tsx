@@ -16,69 +16,55 @@ interface Scene {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   HELPER — construire la playlist (sans page titre)
+   HELPER — playlist sans page titre/meta
 ───────────────────────────────────────────────────────────────*/
 function buildScenes(pages: PageContent[], tsMap: Record<string, WordTimestamp[]> = {}): Scene[] {
   const scenes: Scene[] = []
-
   for (const page of pages) {
-    // Page titre → skipped (le titre est dans la top bar)
     if (page.type === "title" || page.type === "meta") continue
-
     const image =
       page.type === "mixed" ? page.image :
       page.type === "text"  ? (page.image ?? "") :
-      page.type === "image" ? page.src :
-      ""
-
+      page.type === "image" ? page.src : ""
     const audioFiles = (page.type === "mixed" || page.type === "text") ? (page.audioFiles ?? []) : []
-
     if (audioFiles.length > 0) {
       for (const af of audioFiles) {
-        const words = tsMap[af.src] ?? af.words
-        scenes.push({ image, fonText: af.fonText, audioSrc: af.src, wordTimestamps: words })
+        scenes.push({ image, fonText: af.fonText, audioSrc: af.src, wordTimestamps: tsMap[af.src] ?? af.words })
       }
     } else if (image) {
       const fonText =
         page.type === "mixed" ? (page.fonText ?? page.caption) :
         page.type === "text"  ? (page.fonText ?? page.heading ?? "") :
-        page.type === "quote" ? (page.fonText ?? page.verse) :
-        ""
+        page.type === "quote" ? (page.fonText ?? page.verse) : ""
       scenes.push({ image, fonText, audioSrc: null })
     }
   }
-
   return scenes
 }
-
-const BG = "#0a0f1a"
-const TOP_H = 44
-const TEXT_H = 120
-const CTRL_H = 56
 
 /* ─────────────────────────────────────────────────────────────
    COMPOSANT PRINCIPAL
 ───────────────────────────────────────────────────────────────*/
 export function StoryPlayer({ book }: { book: Book }) {
   const [timestampMap, setTimestampMap] = useState<Record<string, WordTimestamp[]>>({})
-
   useEffect(() => {
     fetch("/word_timestamps.json")
       .then(r => r.ok ? r.json() : {})
-      .then((data: Record<string, WordTimestamp[]>) => setTimestampMap(data))
+      .then((d: Record<string, WordTimestamp[]>) => setTimestampMap(d))
       .catch(() => {})
   }, [])
 
   const scenes = useMemo(() => buildScenes(book.pages, timestampMap), [book.pages, timestampMap])
 
-  const [sceneIdx, setSceneIdx]   = useState(0)
-  const [isPlaying, setIsPlaying] = useState(true)  // auto-start
-  const [audioError, setAudioError]   = useState(false)
-  const [touchStart, setTouchStart]   = useState<number | null>(null)
+  const [sceneIdx, setSceneIdx]     = useState(0)
+  const [isPlaying, setIsPlaying]   = useState(true)
+  const [audioError, setAudioError] = useState(false)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration]       = useState(0)
 
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioRef    = useRef<HTMLAudioElement | null>(null)
+  const progressRef = useRef<HTMLDivElement | null>(null)
 
   const current = scenes[sceneIdx] ?? scenes[0]
   const total   = scenes.length
@@ -88,11 +74,10 @@ export function StoryPlayer({ book }: { book: Book }) {
     setSceneIdx(Math.max(0, Math.min(idx, total - 1)))
     setAudioError(false)
   }, [total])
-
   const nextScene = useCallback(() => goTo(sceneIdx + 1), [goTo, sceneIdx])
   const prevScene = useCallback(() => goTo(sceneIdx - 1), [goTo, sceneIdx])
 
-  /* ── Karaoke — timeupdate ── */
+  /* ── Karaoke timeupdate ── */
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -107,10 +92,9 @@ export function StoryPlayer({ book }: { book: Book }) {
       audio.removeEventListener("durationchange", onMeta)
     }
   }, [])
-
   useEffect(() => { setCurrentTime(0); setDuration(0) }, [sceneIdx])
 
-  /* ── Audio setup — charge + joue quand scène change ── */
+  /* ── Audio setup ── */
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -119,13 +103,11 @@ export function StoryPlayer({ book }: { book: Book }) {
       audio.load()
       if (isPlaying) audio.play().catch(() => setAudioError(true))
     } else {
-      audio.pause()
-      audio.src = ""
+      audio.pause(); audio.src = ""
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneIdx, current.audioSrc])
 
-  /* ── Sync play/pause ── */
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || !current.audioSrc) return
@@ -133,14 +115,10 @@ export function StoryPlayer({ book }: { book: Book }) {
     else audio.pause()
   }, [isPlaying, current.audioSrc])
 
-  /* ── Auto-advance ── */
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    const onEnded = () => {
-      if (sceneIdx < total - 1) nextScene()
-      else setIsPlaying(false)
-    }
+    const onEnded = () => { if (sceneIdx < total - 1) nextScene(); else setIsPlaying(false) }
     audio.addEventListener("ended", onEnded)
     return () => audio.removeEventListener("ended", onEnded)
   }, [sceneIdx, total, nextScene])
@@ -149,8 +127,7 @@ export function StoryPlayer({ book }: { book: Book }) {
   useEffect(() => {
     if (!("mediaSession" in navigator) || !current) return
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: book.title,
-      artist: "BibleFon",
+      title: book.title, artist: "BibleFon",
       album: current.fonText.slice(0, 60),
       artwork: [{ src: current.image || book.cover, sizes: "512x512", type: "image/jpeg" }],
     })
@@ -169,8 +146,16 @@ export function StoryPlayer({ book }: { book: Book }) {
     setTouchStart(null)
   }
 
-  const togglePlay = () => { if (current.audioSrc) setIsPlaying(p => !p) }
-  const displayImage = current?.image || book.cover
+  /* ── Progress bar scrub ── */
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !duration) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const ratio = (e.clientX - rect.left) / rect.width
+    audioRef.current.currentTime = ratio * duration
+    setCurrentTime(ratio * duration)
+  }
+
+  const togglePlay = () => { if (current?.audioSrc) setIsPlaying(p => !p) }
 
   /* ── Karaoke ── */
   const words = useMemo(() => {
@@ -190,155 +175,190 @@ export function StoryPlayer({ book }: { book: Book }) {
       : -1
   }, [current, currentTime, duration, words.length])
 
-  const imageH = `calc(100vh - ${TOP_H}px - ${TEXT_H}px - ${CTRL_H}px)`
+  /* ── Progress ratio ── */
+  const progressRatio = duration > 0 ? currentTime / duration : sceneIdx / Math.max(total - 1, 1)
+  const displayImage  = current?.image || book.cover
 
-  /* ═══════════════════════════════════════════════════════════
+  /* ═════════════════════════════════════════════════════════
      RENDER
-  ═══════════════════════════════════════════════════════════ */
+  ═════════════════════════════════════════════════════════ */
   return (
     <div
       className="fixed inset-0 flex flex-col"
-      style={{ background: BG }}
+      style={{ background: "#1a1208", overflow: "hidden" }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       <audio ref={audioRef} preload="auto" />
 
-      {/* ── TOP BAR — 44px opaque ── */}
+      {/* ── HEADER transparent ── */}
       <div
         style={{
-          height: TOP_H,
-          minHeight: TOP_H,
-          background: BG,
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          paddingInline: 12,
-          position: "relative",
-          zIndex: 10,
+          display: "flex", alignItems: "center", gap: 12,
+          padding: "52px 20px 12px",
           flexShrink: 0,
         }}
       >
-        {/* Bouton retour */}
         <Link
           href="/#bibliotheque"
           aria-label="Retour"
           style={{
-            width: 32, height: 32, flexShrink: 0,
-            borderRadius: "50%",
-            background: "#1e3d4a",
+            width: 32, height: 32, borderRadius: "50%",
+            background: "rgba(255,255,255,0.12)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16, color: "white", textDecoration: "none",
+            color: "white", textDecoration: "none", fontSize: 16, flexShrink: 0,
           }}
         >
           ←
         </Link>
-
-        {/* Titres */}
-        <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-          <p style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", margin: 0, lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {book.titleFon}
-          </p>
-          <p style={{ fontSize: 12, fontWeight: 700, color: "white", margin: 0, lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        <div style={{ flex: 1, textAlign: "center", minWidth: 0 }}>
+          <p style={{
+            margin: 0, fontSize: 15, fontWeight: 700, color: "white",
+            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+            fontFamily: "var(--font-serif, Georgia, serif)",
+          }}>
             {book.title}
           </p>
         </div>
-
-        {/* Compteur */}
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>
+        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>
           {sceneIdx + 1} / {total}
         </span>
+      </div>
 
-        {/* Barre de progression — bas de la top bar */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.08)" }}>
-          <div style={{
-            height: "100%",
-            width: `${total > 1 ? (sceneIdx / (total - 1)) * 100 : 100}%`,
-            background: book.accentColor,
-            transition: "width 0.3s ease",
-          }} />
+      {/* ── IMAGE — centrée, border-radius, shadow ── */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 20px", minHeight: 0 }}>
+        <div
+          style={{
+            width: "100%",
+            aspectRatio: "3 / 4",
+            maxHeight: "100%",
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.55)",
+            position: "relative",
+            flexShrink: 0,
+          }}
+          onClick={togglePlay}
+        >
+          {displayImage && (
+            <Image
+              key={displayImage}
+              src={displayImage}
+              alt=""
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
+          {/* Overlay play/pause au tap */}
+          {!isPlaying && current?.audioSrc && (
+            <div style={{
+              position: "absolute", inset: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              background: "rgba(0,0,0,0.25)",
+            }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: "50%",
+                background: "rgba(200,160,64,0.9)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 26,
+              }}>▶</div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ── IMAGE — hauteur fixe calculée ── */}
-      <div
-        style={{ height: imageH, minHeight: imageH, position: "relative", overflow: "hidden", flexShrink: 0 }}
-        onClick={togglePlay}
-      >
-        {displayImage && (
-          <Image
-            key={displayImage}
-            src={displayImage}
-            alt=""
-            fill
-            className="object-cover"
-            priority
-            style={{ cursor: current?.audioSrc ? "pointer" : "default" }}
-          />
-        )}
-      </div>
-
-      {/* ── ZONE TEXTE — 120px fixe, scroll interne ── */}
+      {/* ── ZONE TEXTE — sous l'image, transparent ── */}
       <div
         style={{
-          height: TEXT_H,
-          minHeight: TEXT_H,
-          maxHeight: TEXT_H,
-          background: BG,
-          overflowY: "auto",
-          padding: "12px 16px",
+          height: 80, minHeight: 80, maxHeight: 80,
+          overflow: "hidden",
+          padding: "8px 24px 0",
           flexShrink: 0,
         }}
       >
-        {words.length > 0 ? (
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, fontFamily: "var(--font-serif, Georgia, serif)" }}>
+        {words.length > 0 && (
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, fontFamily: "var(--font-serif, Georgia, serif)", color: "rgba(255,255,255,0.85)" }}>
             {words.map((word, i) => (
               <span
                 key={i}
                 style={{
-                  color: i === currentWordIdx ? book.accentColor : "rgba(255,255,255,0.85)",
+                  color: i === currentWordIdx ? "#c8a040" : "rgba(255,255,255,0.85)",
                   fontWeight: i === currentWordIdx ? 700 : 400,
-                  textShadow: i === currentWordIdx ? `0 0 12px ${book.accentColor}cc` : "none",
-                  transition: "color 0.12s ease, text-shadow 0.12s ease",
+                  textShadow: i === currentWordIdx ? "0 0 12px rgba(200,160,64,0.6)" : "none",
+                  transition: "color 0.12s ease",
                 }}
               >
                 {word}{" "}
               </span>
             ))}
           </p>
-        ) : (
-          audioError && (
-            <p style={{ margin: 0, fontSize: 13, color: "rgba(255,100,100,0.8)", textAlign: "center", paddingTop: 8 }}>
-              Audio indisponible — passe à la scène suivante ⏭
-            </p>
-          )
+        )}
+        {audioError && (
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,100,100,0.8)", textAlign: "center" }}>
+            Audio indisponible ⏭
+          </p>
         )}
       </div>
 
-      {/* ── CONTRÔLES — 56px ── */}
+      {/* ── BARRE DE PROGRESSION — scrubable ── */}
+      <div style={{ padding: "12px 24px 4px", flexShrink: 0 }}>
+        <div
+          ref={progressRef}
+          onClick={handleProgressClick}
+          style={{
+            height: 3, borderRadius: 2,
+            background: "rgba(255,255,255,0.2)",
+            cursor: "pointer", position: "relative",
+          }}
+        >
+          <div style={{
+            position: "absolute", left: 0, top: 0, bottom: 0,
+            width: `${progressRatio * 100}%`,
+            background: "#c8a040",
+            borderRadius: 2,
+            transition: "width 0.1s linear",
+          }} />
+          {/* Thumb */}
+          <div style={{
+            position: "absolute", top: "50%",
+            left: `${progressRatio * 100}%`,
+            transform: "translate(-50%, -50%)",
+            width: 12, height: 12, borderRadius: "50%",
+            background: "#c8a040",
+            boxShadow: "0 0 6px rgba(200,160,64,0.6)",
+          }} />
+        </div>
+        {/* Timestamps textuels */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+            {formatTime(currentTime)}
+          </span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+            {duration > 0 ? `-${formatTime(duration - currentTime)}` : ""}
+          </span>
+        </div>
+      </div>
+
+      {/* ── CONTRÔLES ── */}
       <div
         style={{
-          height: CTRL_H,
-          minHeight: CTRL_H,
-          background: BG,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingInline: 24,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "8px 40px 40px",
           flexShrink: 0,
-          borderTop: "1px solid rgba(255,255,255,0.06)",
         }}
       >
         <button
           onClick={prevScene}
           disabled={sceneIdx === 0}
-          aria-label="Scène précédente"
+          aria-label="Précédent"
           style={{
-            width: 44, height: 44, borderRadius: 10,
-            background: "rgba(255,255,255,0.08)",
-            border: "none", cursor: "pointer", fontSize: 18,
+            width: 48, height: 48, borderRadius: "50%",
+            background: "transparent", border: "none",
+            cursor: sceneIdx === 0 ? "default" : "pointer",
             opacity: sceneIdx === 0 ? 0.3 : 1,
             display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 22, color: "white",
           }}
         >⏮</button>
 
@@ -347,13 +367,13 @@ export function StoryPlayer({ book }: { book: Book }) {
           disabled={!current?.audioSrc}
           aria-label={isPlaying ? "Pause" : "Lecture"}
           style={{
-            width: 52, height: 52, borderRadius: "50%",
-            background: current?.audioSrc
-              ? `linear-gradient(135deg, ${book.accentColor}, ${book.accentColor}bb)`
-              : "rgba(255,255,255,0.12)",
-            boxShadow: current?.audioSrc ? `0 4px 20px ${book.accentColor}55` : "none",
-            border: "none", cursor: current?.audioSrc ? "pointer" : "default",
-            fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center",
+            width: 64, height: 64, borderRadius: "50%",
+            background: current?.audioSrc ? "#c8a040" : "rgba(255,255,255,0.15)",
+            boxShadow: current?.audioSrc ? "0 4px 24px rgba(200,160,64,0.5)" : "none",
+            border: "none",
+            cursor: current?.audioSrc ? "pointer" : "default",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 24, color: current?.audioSrc ? "#1a1208" : "rgba(255,255,255,0.4)",
           }}
         >
           {isPlaying ? "⏸" : "▶"}
@@ -362,16 +382,25 @@ export function StoryPlayer({ book }: { book: Book }) {
         <button
           onClick={nextScene}
           disabled={sceneIdx === total - 1}
-          aria-label="Scène suivante"
+          aria-label="Suivant"
           style={{
-            width: 44, height: 44, borderRadius: 10,
-            background: "rgba(255,255,255,0.08)",
-            border: "none", cursor: "pointer", fontSize: 18,
+            width: 48, height: 48, borderRadius: "50%",
+            background: "transparent", border: "none",
+            cursor: sceneIdx === total - 1 ? "default" : "pointer",
             opacity: sceneIdx === total - 1 ? 0.3 : 1,
             display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 22, color: "white",
           }}
         >⏭</button>
       </div>
     </div>
   )
+}
+
+/* ── Utilitaire : formatage MM:SS ── */
+function formatTime(sec: number): string {
+  if (!sec || isNaN(sec)) return "0:00"
+  const m = Math.floor(sec / 60)
+  const s = Math.floor(sec % 60)
+  return `${m}:${s.toString().padStart(2, "0")}`
 }
