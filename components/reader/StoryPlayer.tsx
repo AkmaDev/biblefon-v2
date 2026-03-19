@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import type { Book, PageContent } from "@/lib/books"
+import type { Book, PageContent, WordTimestamp } from "@/lib/books"
 
 /* ─────────────────────────────────────────────────────────────
    TYPES
@@ -13,6 +13,7 @@ interface Scene {
   fonText: string
   audioSrc: string | null
   isTitle?: boolean
+  wordTimestamps?: WordTimestamp[]
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ function buildScenes(pages: PageContent[]): Scene[] {
 
     if (audioFiles.length > 0) {
       for (const af of audioFiles) {
-        scenes.push({ image, fonText: af.fonText, audioSrc: af.src })
+        scenes.push({ image, fonText: af.fonText, audioSrc: af.src, wordTimestamps: af.words })
       }
     } else if (image) {
       // Page sans audio — scène muette, avancement manuel
@@ -211,14 +212,29 @@ export function StoryPlayer({ book }: { book: Book }) {
   /* ── Image à afficher (fallback sur cover) ───────────────── */
   const displayImage = current.image || book.cover
 
-  /* ── Karaoke — index du mot courant ─────────────────────── */
-  const words = useMemo(
-    () => (current.fonText ? current.fonText.split(/\s+/).filter(Boolean) : []),
-    [current.fonText]
-  )
-  const currentWordIdx = duration > 0
-    ? Math.min(Math.floor((currentTime / duration) * words.length), words.length - 1)
-    : -1
+  /* ── Karaoke — mots et index courant ────────────────────── */
+  const words = useMemo(() => {
+    if (current.wordTimestamps && current.wordTimestamps.length > 0) {
+      return current.wordTimestamps.map(w => w.word)
+    }
+    return current.fonText ? current.fonText.split(/\s+/).filter(Boolean) : []
+  }, [current])
+
+  const currentWordIdx = useMemo(() => {
+    if (current.wordTimestamps && current.wordTimestamps.length > 0) {
+      // Timestamps exacts : chercher le mot dont start <= currentTime < end suivant
+      const wts = current.wordTimestamps
+      const idx = wts.findIndex((w, i) =>
+        currentTime >= w.start &&
+        (i === wts.length - 1 || currentTime < wts[i + 1].start)
+      )
+      return idx
+    }
+    // Fallback proportionnel
+    return duration > 0
+      ? Math.min(Math.floor((currentTime / duration) * words.length), words.length - 1)
+      : -1
+  }, [current, currentTime, duration, words.length])
 
   /* ═══════════════════════════════════════════════════════════
      RENDER

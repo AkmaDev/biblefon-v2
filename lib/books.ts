@@ -1,9 +1,21 @@
+export interface WordTimestamp {
+  word:  string
+  start: number  // secondes
+  end:   number  // secondes
+}
+
+export interface AudioFile {
+  src:     string
+  fonText: string
+  words?:  WordTimestamp[]  // timestamps mot-par-mot (optionnel, karaoke précis)
+}
+
 export type PageContent =
   | { type: "title"; image: string; title: string; titleFon: string }
   | { type: "meta"; reference: string; note: string; intro?: string }
-  | { type: "text"; heading?: string; body: string; fonText?: string; image?: string; imgPosition?: string; audioFiles?: { src: string; fonText: string }[] }
+  | { type: "text"; heading?: string; body: string; fonText?: string; image?: string; imgPosition?: string; audioFiles?: AudioFile[] }
   | { type: "image"; src: string; alt?: string }
-  | { type: "mixed"; image: string; caption: string; body: string; fonText?: string; imgPosition?: string; audioFiles?: { src: string; fonText: string }[] }
+  | { type: "mixed"; image: string; caption: string; body: string; fonText?: string; imgPosition?: string; audioFiles?: AudioFile[] }
   | { type: "quote"; verse: string; reference: string; fonText?: string }
 
 export interface Book {
