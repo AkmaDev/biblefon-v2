@@ -129,7 +129,7 @@ export function BookCard({ book, index }: BookCardProps) {
 
   return (
     <Link
-      href={`/flipbook/${book.id}`}
+      href={`/story/${book.id}`}
       className="group block"
       style={{ animationDelay: `${delay}ms` }}
     >
