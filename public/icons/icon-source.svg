@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1420"/>
+      <stop offset="100%" stop-color="#1a0e04"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#9b6e18"/>
+      <stop offset="50%"  stop-color="#e0b554"/>
+      <stop offset="100%" stop-color="#9b6e18"/>
+    </linearGradient>
+    <linearGradient id="book" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#c9922a"/>
+      <stop offset="100%" stop-color="#e0b554"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fond -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Livre ouvert centré — scale depuis viewBox 60×50 → centré dans 512×512 -->
+  <g transform="translate(256,220) scale(5.5)">
+    <!-- Page gauche -->
+    <path d="M-30 -18 Q-30 -22 -26 -23 L-4 -25 Q-2 -25 -2 -23 L-2 18 Q-2 20 -4 20 L-26 18 Q-30 18 -30 14 Z"
+          fill="#2a1a08" stroke="url(#gold)" stroke-width="1.2"/>
+    <!-- Lignes page gauche -->
+    <line x1="-26" y1="-13" x2="-6" y2="-14" stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="-26" y1="-7"  x2="-6" y2="-8"  stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="-26" y1="-1"  x2="-6" y2="-2"  stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="-26" y1="5"   x2="-6" y2="4"   stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="-26" y1="11"  x2="-6" y2="10"  stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+
+    <!-- Page droite -->
+    <path d="M2 -23 Q2 -25 4 -25 L26 -23 Q30 -22 30 -18 L30 14 Q30 18 26 18 L4 20 Q2 20 2 18 Z"
+          fill="#2a1a08" stroke="url(#gold)" stroke-width="1.2"/>
+    <!-- Lignes page droite -->
+    <line x1="6" y1="-14" x2="26" y2="-13" stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="6" y1="-8"  x2="26" y2="-7"  stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="6" y1="-2"  x2="26" y2="-1"  stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="6" y1="4"   x2="26" y2="5"   stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+    <line x1="6" y1="10"  x2="26" y2="11"  stroke="#c9922a" stroke-width="0.7" opacity="0.6"/>
+
+    <!-- Reliure -->
+    <line x1="0" y1="-25" x2="0" y2="20" stroke="url(#gold)" stroke-width="2.5" filter="url(#glow)"/>
+
+    <!-- Croix page droite -->
+    <line x1="16" y1="-19" x2="16" y2="-11" stroke="#e0b554" stroke-width="2" opacity="0.9"/>
+    <line x1="12" y1="-15" x2="20" y2="-15" stroke="#e0b554" stroke-width="2" opacity="0.9"/>
+
+    <!-- Étincelle -->
+    <text x="0" y="-28" text-anchor="middle" font-size="6" fill="#e0b554" opacity="0.9">✦</text>
+  </g>
+
+  <!-- Texte BibleFon -->
+  <text x="256" y="380"
+        font-family="Georgia, serif"
+        font-size="72"
+        font-weight="700"
+        letter-spacing="2"
+        text-anchor="middle"
+        fill="url(#gold)"
+        filter="url(#glow)">BibleFon</text>
+
+  <!-- Sous-titre -->
+  <text x="256" y="420"
+        font-family="Georgia, serif"
+        font-size="22"
+        letter-spacing="5"
+        text-anchor="middle"
+        fill="#c9922a"
+        opacity="0.7">EN LANGUE FON</text>
+
+  <!-- Ligne décorative -->
+  <line x1="96" y1="440" x2="416" y2="440" stroke="url(#gold)" stroke-width="1" opacity="0.35"/>
+</svg>
