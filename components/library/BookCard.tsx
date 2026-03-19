@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Clock, BookOpen, ChevronRight, Lock } from "lucide-react"
+import { Clock, Lock } from "lucide-react"
 import type { Book } from "@/lib/books"
 
 interface BookCardProps {
@@ -34,7 +34,7 @@ export function BookCard({ book, index }: BookCardProps) {
         />
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
         {/* Coming soon overlay */}
         {book.comingSoon && (
@@ -58,48 +58,62 @@ export function BookCard({ book, index }: BookCardProps) {
           {book.testament === "ancien" ? "Ancien Testament" : "Nouveau Testament"}
         </div>
 
-        {/* Page count badge — hidden for coming-soon */}
+        {/* Big play button — centre de l'image, visible au hover */}
         {!book.comingSoon && (
-          <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] text-stone-300">
-            <BookOpen className="w-3 h-3" />
-            {book.pages.length - 1} pages
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div
+              className="flex items-center justify-center rounded-full shadow-2xl"
+              style={{
+                width: 64, height: 64,
+                background: `linear-gradient(135deg, ${book.accentColor}, ${book.accentColor}cc)`,
+                boxShadow: `0 8px 32px ${book.accentColor}66`,
+              }}
+            >
+              <span style={{ fontSize: 26, marginLeft: 4 }}>▶</span>
+            </div>
           </div>
         )}
 
-        {/* Bottom overlay — title + description + metadata */}
+        {/* Bottom overlay — titre + CTA audio */}
         <div
-          className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-16"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 55%, transparent 100%)" }}
+          className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-20"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 55%, transparent 100%)" }}
         >
-          <p className="text-xs font-medium mb-1 opacity-75" style={{ color: book.accentColor }}>
+          <p className="text-xs font-medium mb-0.5 opacity-75" style={{ color: book.accentColor }}>
             {book.titleFon}
           </p>
-          <h2 className="text-base font-bold text-white leading-tight font-[var(--font-serif)] mb-2">
+          <h2 className="text-base font-bold text-white leading-tight mb-3">
             {book.title}
           </h2>
-          <p className="text-xs text-stone-300 leading-relaxed line-clamp-3 opacity-90">
-            {book.description}
-          </p>
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center gap-3 text-xs text-stone-400">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {book.readingTime}
-              </span>
-              <span>{book.ageRange}</span>
-            </div>
-            {book.comingSoon ? (
-              <span className="text-xs font-semibold text-white/40">Bientôt</span>
-            ) : (
-              <div
-                className="flex items-center gap-1 text-xs font-semibold transition-all duration-200 group-hover:gap-2"
-                style={{ color: book.accentColor }}
-              >
-                Lire
-                <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </div>
-            )}
+
+          {/* Métadonnées */}
+          <div className="flex items-center gap-3 text-xs text-stone-400 mb-3">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {book.readingTime}
+            </span>
+            <span>{book.ageRange}</span>
           </div>
+
+          {/* CTA principal — Écouter en Fon */}
+          {book.comingSoon ? (
+            <div className="flex items-center justify-center h-12 rounded-xl bg-white/10 text-xs font-semibold text-white/40">
+              Bientôt disponible
+            </div>
+          ) : (
+            <div
+              className="flex items-center justify-center gap-2 rounded-xl font-semibold text-sm transition-all duration-200 group-hover:shadow-lg"
+              style={{
+                minHeight: 48,
+                background: `linear-gradient(135deg, ${book.accentColor}, ${book.accentColor}bb)`,
+                color: "#0c0804",
+                boxShadow: `0 4px 16px ${book.accentColor}44`,
+              }}
+            >
+              <span>▶</span>
+              <span>Écouter en Fon</span>
+            </div>
+          )}
         </div>
       </div>
     </article>

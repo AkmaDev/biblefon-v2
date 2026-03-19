@@ -16,7 +16,7 @@ export function BookGrid() {
             Choisissez une histoire
           </h2>
           <p className="mt-3 text-[var(--muted-foreground)] max-w-md mx-auto">
-            Chaque livre peut être lu en silence ou écouté en langue fon grâce à la synthèse vocale.
+            Appuie sur une histoire — l'audio en Fon démarre. Pas besoin de lire.
           </p>
         </div>
 

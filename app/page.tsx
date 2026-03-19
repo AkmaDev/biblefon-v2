@@ -4,9 +4,9 @@ import { BookGrid } from "@/components/library/BookGrid"
 import { Volume2, BookOpen, Users } from "lucide-react"
 
 const features = [
-  { icon: Volume2, label: "Audio en Fon", desc: "Chaque histoire lue à voix haute en langue fon grâce à l'IA de Meta." },
-  { icon: BookOpen, label: "Illustrées", desc: "Des images générées par IA pour donner vie aux récits bibliques." },
-  { icon: Users, label: "Pour toute la famille", desc: "Des histoires adaptées aux enfants de 4 à 12 ans." },
+  { icon: Volume2, label: "Audio en Fon", desc: "Appuie play — l'histoire se raconte seule en langue fon. Pas besoin de lire." },
+  { icon: BookOpen, label: "Images synchronisées", desc: "Chaque scène illustrée avance avec l'audio. Comme un dessin animé." },
+  { icon: Users, label: "Pour toute la famille", desc: "Parents et enfants ensemble, sans barrière de lecture. 4 à 12 ans." },
 ]
 
 export default function HomePage() {
@@ -84,20 +84,25 @@ export default function HomePage() {
             style={{ animationDelay: "0.3s" }}>
             <a
               href="#bibliotheque"
-              className="px-8 py-3.5 rounded-full font-semibold text-sm transition-all duration-300
+              className="flex items-center gap-2 font-semibold text-base transition-all duration-300
                 hover:scale-105 hover:shadow-[0_0_30px_rgba(201,146,42,0.4)]"
               style={{
+                minHeight: 52,
+                paddingInline: 32,
+                borderRadius: 999,
                 background: "linear-gradient(135deg, var(--gold-dark), var(--gold))",
                 color: "#0c0804",
               }}
             >
-              📖 Commencer à lire
+              <span style={{ fontSize: 18 }}>▶</span>
+              Écouter en Fon
             </a>
             <a
               href="#features"
-              className="px-8 py-3.5 rounded-full text-sm font-medium text-white/60
+              className="flex items-center px-8 text-sm font-medium text-white/60
                 border border-white/15 hover:border-white/30 hover:text-white/85
-                transition-all duration-300"
+                transition-all duration-300 rounded-full"
+              style={{ minHeight: 52 }}
             >
               En savoir plus
             </a>
