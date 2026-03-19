@@ -51,7 +51,7 @@ function buildScenes(pages: PageContent[], tsMap: Record<string, WordTimestamp[]
   return scenes
 }
 
-const BG = "#0d1e2a"
+const BG = "#0a0f1a"
 const TOP_H = 44
 const TEXT_H = 120
 const CTRL_H = 56
