@@ -19,7 +19,7 @@ interface Scene {
 /* ─────────────────────────────────────────────────────────────
    HELPER — construire la playlist de scènes depuis les pages
 ───────────────────────────────────────────────────────────────*/
-function buildScenes(pages: PageContent[]): Scene[] {
+function buildScenes(pages: PageContent[], tsMap: Record<string, WordTimestamp[]> = {}): Scene[] {
   const scenes: Scene[] = []
 
   for (const page of pages) {
@@ -46,7 +46,8 @@ function buildScenes(pages: PageContent[]): Scene[] {
 
     if (audioFiles.length > 0) {
       for (const af of audioFiles) {
-        scenes.push({ image, fonText: af.fonText, audioSrc: af.src, wordTimestamps: af.words })
+        const words = tsMap[af.src] ?? af.words
+        scenes.push({ image, fonText: af.fonText, audioSrc: af.src, wordTimestamps: words })
       }
     } else if (image) {
       // Page sans audio — scène muette, avancement manuel
@@ -66,7 +67,20 @@ function buildScenes(pages: PageContent[]): Scene[] {
    COMPOSANT PRINCIPAL
 ───────────────────────────────────────────────────────────────*/
 export function StoryPlayer({ book }: { book: Book }) {
-  const scenes = useMemo(() => buildScenes(book.pages), [book.pages])
+  const [timestampMap, setTimestampMap] = useState<Record<string, WordTimestamp[]>>({})
+
+  // Charge word_timestamps.json depuis /public une seule fois
+  useEffect(() => {
+    fetch("/word_timestamps.json")
+      .then(r => r.ok ? r.json() : {})
+      .then((data: Record<string, WordTimestamp[]>) => setTimestampMap(data))
+      .catch(() => {/* pas de timestamps = fallback proportionnel */})
+  }, [])
+
+  const scenes = useMemo(
+    () => buildScenes(book.pages, timestampMap),
+    [book.pages, timestampMap]
+  )
 
   const [sceneIdx, setSceneIdx]   = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)

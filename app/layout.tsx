@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "BibleFon — Histoires Bibliques en Langue Fon",
   description:
-    "Des histoires bibliques illustrées, lues et écoutées en langue fon pour les enfants et les familles.",
+    "Histoires bibliques illustrées, racontées en langue fon. Pour les enfants du Bénin et de la diaspora — des récits de foi dans leur langue maternelle.",
   keywords: ["Bible", "Fon", "Bénin", "histoires pour enfants", "langue fon", "audio"],
   manifest: "/manifest.json",
   appleWebApp: {

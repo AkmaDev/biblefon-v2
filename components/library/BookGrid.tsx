@@ -12,12 +12,6 @@ export function BookGrid() {
           >
             Bibliothèque
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-[var(--foreground)] font-[var(--font-serif)]">
-            Choisissez une histoire
-          </h2>
-          <p className="mt-3 text-[var(--muted-foreground)] max-w-md mx-auto">
-            Appuie sur une histoire — l'audio en Fon démarre. Pas besoin de lire.
-          </p>
         </div>
 
         {/* Grid */}

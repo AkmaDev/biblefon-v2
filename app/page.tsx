@@ -1,13 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
 import { BookGrid } from "@/components/library/BookGrid"
-import { Volume2, BookOpen, Users } from "lucide-react"
-
-const features = [
-  { icon: Volume2, label: "Audio en Fon", desc: "Appuie play — l'histoire se raconte seule en langue fon. Pas besoin de lire." },
-  { icon: BookOpen, label: "Images synchronisées", desc: "Chaque scène illustrée avance avec l'audio. Comme un dessin animé." },
-  { icon: Users, label: "Pour toute la famille", desc: "Parents et enfants ensemble, sans barrière de lecture. 4 à 12 ans." },
-]
 
 export default function HomePage() {
   return (
@@ -16,9 +9,15 @@ export default function HomePage() {
       {/* ── Nav ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
         style={{ background: "linear-gradient(to bottom, rgba(8,6,4,0.7) 0%, transparent 100%)" }}>
-        <span className="font-bold text-white text-base" style={{ fontFamily: "var(--font-serif)" }}>
-          BibleFon
-        </span>
+        <div className="flex flex-col">
+          <span className="font-bold text-white text-base leading-tight" style={{ fontFamily: "var(--font-serif)" }}>
+            BibleFon
+          </span>
+          <span className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
+            style={{ color: "var(--gold-light)", opacity: 0.8 }}>
+            Audio · Illustré · En Langue Fon
+          </span>
+        </div>
         <Link
           href="/about"
           className="text-sm px-4 py-1.5 rounded-full transition-all duration-200
@@ -34,8 +33,8 @@ export default function HomePage() {
         {/* Background image with overlay */}
         <div className="absolute inset-0">
           <Image
-            src="/hero.jpg"
-            alt="Enfants sous un baobab"
+            src="/pageaccueil.png"
+            alt="BibleFon"
             fill
             className="object-cover"
             priority
@@ -49,87 +48,19 @@ export default function HomePage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-2xl mx-auto text-center space-y-8">
-
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase animate-fade-in"
-            style={{
-              background: "rgba(201,146,42,0.12)",
-              border: "1px solid rgba(201,146,42,0.3)",
-              color: "var(--gold-light)",
-            }}>
-            🎧 Audio · Illustré · En Langue Fon
-          </div>
-
+        <div className="relative z-10 max-w-2xl mx-auto text-center space-y-6">
           {/* Main title */}
-          <div className="space-y-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+          <div className="space-y-3 animate-fade-in">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-none tracking-tight"
               style={{ fontFamily: "var(--font-serif)" }}>
               Bible<span className="shimmer-text">Fon</span>
             </h1>
-            <p className="text-xl md:text-2xl text-white/70 font-light leading-relaxed">
-              Histoires bibliques illustrées,{" "}
-              <span className="text-white/90 font-medium">racontées en langue fon</span>
-            </p>
-          </div>
-
-          {/* Subtext */}
-          <p className="text-base text-white/50 max-w-md mx-auto leading-relaxed animate-fade-in"
-            style={{ animationDelay: "0.2s" }}>
-            Pour les enfants du Bénin et de la diaspora — des récits de foi dans leur langue maternelle.
-          </p>
-
-          {/* CTA */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center animate-fade-in"
-            style={{ animationDelay: "0.3s" }}>
-            <a
-              href="#bibliotheque"
-              className="flex items-center gap-2 font-semibold text-base transition-all duration-300
-                hover:scale-105 hover:shadow-[0_0_30px_rgba(201,146,42,0.4)]"
-              style={{
-                minHeight: 52,
-                paddingInline: 32,
-                borderRadius: 999,
-                background: "linear-gradient(135deg, var(--gold-dark), var(--gold))",
-                color: "#0c0804",
-              }}
-            >
-              <span style={{ fontSize: 18 }}>▶</span>
-              Écouter en Fon
-            </a>
-            <a
-              href="#features"
-              className="flex items-center px-8 text-sm font-medium text-white/60
-                border border-white/15 hover:border-white/30 hover:text-white/85
-                transition-all duration-300 rounded-full"
-              style={{ minHeight: 52 }}
-            >
-              En savoir plus
-            </a>
           </div>
         </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
           <div className="w-px h-8 bg-white/50" />
-        </div>
-      </section>
-
-      {/* ── Features strip ── */}
-      <section id="features" className="py-16 px-4 border-y border-[var(--border)]">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map(({ icon: Icon, label, desc }) => (
-            <div key={label}
-              className="flex flex-col items-center text-center gap-3 p-6 rounded-xl"
-              style={{ background: "var(--card)", border: "1px solid var(--border)" }}>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ background: "rgba(201,146,42,0.12)", border: "1px solid rgba(201,146,42,0.2)" }}>
-                <Icon className="w-5 h-5" style={{ color: "var(--gold)" }} />
-              </div>
-              <h3 className="font-semibold text-white text-sm">{label}</h3>
-              <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{desc}</p>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -140,36 +71,17 @@ export default function HomePage() {
 
       {/* ── Footer ── */}
       <footer className="py-10 px-4 border-t border-[var(--border)]">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="font-bold text-[var(--foreground)] text-sm"
-              style={{ fontFamily: "var(--font-serif)" }}>
-              BibleFon
-            </p>
-            <p className="text-xs text-[var(--muted-foreground)]">
-              Histoires bibliques en langue fon
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center gap-3 text-xs text-[var(--muted-foreground)]">
-            <span>
-              Audio propulsé par{" "}
-              <a href="https://huggingface.co/facebook/mms-tts-fon"
-                target="_blank" rel="noopener noreferrer"
-                className="hover:underline"
-                style={{ color: "var(--gold-dark)" }}>
-                Meta MMS-TTS-FON
-              </a>
-              {" "}· Illustrations par IA
-            </span>
-            <span className="hidden sm:inline" style={{ color: "var(--border)" }}>·</span>
-            <Link
-              href="/about"
-              className="hover:underline transition-colors"
-              style={{ color: "var(--gold-dark)" }}
-            >
-              À propos du projet
-            </Link>
-          </div>
+        <div className="max-w-4xl mx-auto flex items-center justify-center">
+          <span className="text-xs text-[var(--muted-foreground)]">
+            Audio propulsé par{" "}
+            <a href="https://huggingface.co/facebook/mms-tts-fon"
+              target="_blank" rel="noopener noreferrer"
+              className="hover:underline"
+              style={{ color: "var(--gold-dark)" }}>
+              Meta MMS-TTS-FON
+            </a>
+            {" "}· Illustrations par IA
+          </span>
         </div>
       </footer>
     </main>
