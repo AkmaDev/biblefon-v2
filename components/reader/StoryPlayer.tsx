@@ -72,6 +72,8 @@ export function StoryPlayer({ book }: { book: Book }) {
   const [iosUnlocked, setIosUnlocked] = useState(false)
   const [audioError, setAudioError]   = useState(false)
   const [touchStart, setTouchStart]   = useState<number | null>(null)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration]       = useState(0)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -87,6 +89,28 @@ export function StoryPlayer({ book }: { book: Book }) {
 
   const nextScene = useCallback(() => goTo(sceneIdx + 1), [goTo, sceneIdx])
   const prevScene = useCallback(() => goTo(sceneIdx - 1), [goTo, sceneIdx])
+
+  /* ── Karaoke — suivi de la position audio ────────────────── */
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const onTime = () => setCurrentTime(audio.currentTime)
+    const onMeta = () => setDuration(audio.duration || 0)
+    audio.addEventListener("timeupdate",    onTime)
+    audio.addEventListener("loadedmetadata", onMeta)
+    audio.addEventListener("durationchange", onMeta)
+    return () => {
+      audio.removeEventListener("timeupdate",    onTime)
+      audio.removeEventListener("loadedmetadata", onMeta)
+      audio.removeEventListener("durationchange", onMeta)
+    }
+  }, [])
+
+  /* Reset position quand on change de scène */
+  useEffect(() => {
+    setCurrentTime(0)
+    setDuration(0)
+  }, [sceneIdx])
 
   /* ── Audio setup ─────────────────────────────────────────── */
   useEffect(() => {
@@ -186,6 +210,15 @@ export function StoryPlayer({ book }: { book: Book }) {
 
   /* ── Image à afficher (fallback sur cover) ───────────────── */
   const displayImage = current.image || book.cover
+
+  /* ── Karaoke — index du mot courant ─────────────────────── */
+  const words = useMemo(
+    () => (current.fonText ? current.fonText.split(/\s+/).filter(Boolean) : []),
+    [current.fonText]
+  )
+  const currentWordIdx = duration > 0
+    ? Math.min(Math.floor((currentTime / duration) * words.length), words.length - 1)
+    : -1
 
   /* ═══════════════════════════════════════════════════════════
      RENDER
@@ -326,17 +359,33 @@ export function StoryPlayer({ book }: { book: Book }) {
       {/* ── BOTTOM PANEL ── */}
       <div className="relative z-10 flex-shrink-0 px-4 pb-8">
 
-        {/* Texte Fon (segment actuel) */}
-        {!current.isTitle && current.fonText && (
+        {/* Texte Fon — karaoke mot par mot */}
+        {!current.isTitle && words.length > 0 && (
           <div
             className="mb-4 rounded-xl px-4 py-3"
             style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(12px)" }}
           >
             <p
-              className="text-sm leading-relaxed text-white/90 font-medium"
+              className="text-sm leading-relaxed font-medium"
               style={{ fontFamily: "var(--font-serif, Georgia, serif)" }}
             >
-              {current.fonText}
+              {words.map((word, i) => (
+                <span
+                  key={i}
+                  style={{
+                    color: i === currentWordIdx
+                      ? book.accentColor
+                      : "rgba(255,255,255,0.85)",
+                    fontWeight: i === currentWordIdx ? 700 : 500,
+                    textShadow: i === currentWordIdx
+                      ? `0 0 14px ${book.accentColor}cc`
+                      : "none",
+                    transition: "color 0.12s ease, text-shadow 0.12s ease",
+                  }}
+                >
+                  {word}{" "}
+                </span>
+              ))}
             </p>
           </div>
         )}
