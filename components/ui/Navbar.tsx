@@ -30,13 +30,14 @@ export function Navbar() {
           BibleFon
         </span>
         <span
-          className="text-[10px] font-semibold tracking-widest uppercase leading-tight"
+          className="text-[9px] font-semibold tracking-widest uppercase leading-tight"
           style={{
             color: "var(--gold-light)",
             maxHeight: scrolled ? 0 : 20,
             opacity: scrolled ? 0 : 0.8,
             transition: "max-height 0.3s ease, opacity 0.3s ease",
             overflow: "hidden",
+            whiteSpace: "nowrap",
           }}
         >
           Audio · Illustré · En Langue Fon
