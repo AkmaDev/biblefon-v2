@@ -379,7 +379,7 @@ function FrContent() {
               Je m'appelle <span style={{ color: "var(--foreground)" }}>Manassé A. AKPOVI</span>. Je suis béninois. Licence en génie logiciel à l'IFRI (Cotonou), puis bachelor en ingénierie web à l'ESGI Paris. Ce projet est né à la croisée de ce parcours et d'une conviction : <span style={{ color: "var(--foreground)" }}>le numérique peut et doit parler à ceux qu'il ignore aujourd'hui</span>.
             </p>
             <p>
-              BibleFon a démarré lors du hackathon SENIA 2024, dont le thème était « l'IA multimodale au service de nos langues locales ». Pour la première fois depuis que je codais, je ne travaillais pas sur une fonctionnalité abstraite. Je travaillais sur quelque chose qui avait du sens pour des millions de personnes réelles, qui parlent une langue réelle — mais que les outils numériques ignorent presque entièrement.
+              C'est lors du hackathon SENIA 2024, dont le thème était « l'IA multimodale au service de nos langues locales », qu'une question s'est plantée en moi et ne m'a plus quitté. Pour la première fois depuis que je codais, je travaillais sur quelque chose qui avait du sens pour des millions de personnes réelles, qui parlent une langue réelle — mais que les outils numériques ignorent presque entièrement. BibleFon a été lancé en mars 2026 — ma réponse concrète à cette question.
             </p>
           </div>
         </div>
@@ -390,26 +390,9 @@ function FrContent() {
       {/* Section 7 — Ce que je cherche */}
       <section className="space-y-5">
         <h2 className="text-xl font-semibold" style={{ color: "var(--foreground)" }}>Ce que je cherche</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
-          {[
-            { icon: "💬", title: "Retours de locuteurs fon", body: "Prononciation, intonation, vocabulaire — si quelque chose sonne faux, je veux le savoir." },
-            { icon: "🤝", title: "Partenaires de distribution", body: "Écoles, associations, ONG en Afrique de l'Ouest pour diffuser BibleFon là où il est utile." },
-            { icon: "💻", title: "Collaborateurs techniques", body: "Développeurs Next.js / PWA / audio web intéressés par le numérique inclusif." },
-            { icon: "🌱", title: "Financement et soutien", body: "Pour développer plus d'histoires, de langues, d'illustrations — Abraham, Ruth, Jonas..." },
-          ].map(({ icon, title, body }) => (
-            <div
-              key={title}
-              className="rounded-xl p-4 space-y-2"
-              style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-            >
-              <p>
-                <span className="mr-1.5">{icon}</span>
-                <span className="font-semibold text-sm" style={{ color: "var(--foreground)" }}>{title}</span>
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{body}</p>
-            </div>
-          ))}
-        </div>
+        <p className="text-base leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          Si vous êtes locuteur fon natif, partenaire potentiel (école, association, ONG en Afrique de l'Ouest), développeur intéressé par le numérique inclusif, ou simplement quelqu'un qui croit que ces langues méritent leur place dans le numérique — écrivez-moi.
+        </p>
       </section>
 
       <Divider />
@@ -753,7 +736,7 @@ function EnContent() {
               My name is <span style={{ color: "var(--foreground)" }}>Manassé A. AKPOVI</span>. I am from Benin. I studied software engineering at IFRI in Cotonou, then moved to Paris to study web engineering at ESGI. This project was born at the intersection of that journey and a conviction: <span style={{ color: "var(--foreground)" }}>the digital world can — and must — speak to those it currently ignores</span>.
             </p>
             <p>
-              BibleFon started at the SENIA 2024 hackathon, themed around AI and local languages. For the first time in my career as a developer, I was not building an abstract feature. I was working on something that mattered to millions of real people — people who speak a real language, but whom digital tools almost entirely overlook.
+              It was at the SENIA 2024 hackathon, themed around AI and local languages, that a question planted itself in me and never left. For the first time in my career as a developer, I was not building an abstract feature. I was working on something that mattered to millions of real people — people who speak a real language, but whom digital tools almost entirely overlook. BibleFon launched in March 2026 — my concrete answer to that question.
             </p>
           </div>
         </div>
@@ -764,26 +747,9 @@ function EnContent() {
       {/* Section 7 — What I'm looking for */}
       <section className="space-y-5">
         <h2 className="text-xl font-semibold" style={{ color: "var(--foreground)" }}>What I am looking for</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
-          {[
-            { icon: "💬", title: "Feedback from Fon speakers", body: "Pronunciation, intonation, vocabulary — if something sounds wrong, I want to know." },
-            { icon: "🤝", title: "Distribution partners", body: "Schools, associations, NGOs in West Africa to bring BibleFon where it is most needed." },
-            { icon: "💻", title: "Technical collaborators", body: "Next.js / PWA / web audio developers interested in inclusive digital products." },
-            { icon: "🌱", title: "Funding and support", body: "To develop more stories, more languages, more illustrations — Abraham, Ruth, Jonah..." },
-          ].map(({ icon, title, body }) => (
-            <div
-              key={title}
-              className="rounded-xl p-4 space-y-2"
-              style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-            >
-              <p>
-                <span className="mr-1.5">{icon}</span>
-                <span className="font-semibold text-sm" style={{ color: "var(--foreground)" }}>{title}</span>
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{body}</p>
-            </div>
-          ))}
-        </div>
+        <p className="text-base leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+          If you are a native Fon speaker, a potential partner (school, association, NGO in West Africa), a developer interested in inclusive digital products, or simply someone who believes these languages belong in the digital world — reach out.
+        </p>
       </section>
 
       <Divider />
