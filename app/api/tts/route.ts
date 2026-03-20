@@ -56,8 +56,9 @@ export async function POST(req: NextRequest) {
 
   const token = process.env.HF_TOKEN
   if (!token) {
+    console.error("[TTS] Variable d'environnement HF_TOKEN manquante.")
     return Response.json(
-      { error: "Clé HF_TOKEN manquante. Ajoutez-la dans .env.local." },
+      { error: "Service de synthèse vocale temporairement indisponible." },
       { status: 503 }
     )
   }

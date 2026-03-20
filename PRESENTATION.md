@@ -73,6 +73,62 @@ Voilà ce qui a été construit ensemble :
 
 ---
 
+## BibleFon v2 — Ce qui a été construit
+
+Après le lancement de la v1 (le flipbook David), une deuxième version a été développée. L'objectif : transformer BibleFon d'un lecteur de livre unique en une **plateforme de bibliothèque interactive** — avec une expérience d'entrée soignée, un système audio immersif, et une interface mobile-first repensée.
+
+### Une nouvelle page d'accueil
+
+La page d'accueil a été entièrement redessinée. Un hero pleine hauteur avec une photo de fond, une palette de couleurs chaudes (or, brun, ambre), et un chevron animé qui invite à descendre vers la bibliothèque. Chaque détail visuel est pensé pour créer une ambiance — comme entrer dans une salle de conte.
+
+### Une bibliothèque de livres
+
+La page principale présente maintenant une grille de cartes livres, avec couverture illustrée, titre en fon et en français, durée de lecture, et tranche d'âge. Les livres terminés sont cliquables. Les livres à venir (La Fournaise, Noé) sont affichés avec un badge "À venir" — la bibliothèque prend forme visuellement.
+
+### Aperçus audio sur les cartes
+
+C'est la fonctionnalité la plus complexe de la v2. Chaque carte est associée à un fichier audio de quelques secondes qui joue en aperçu.
+
+**Sur desktop :** le survol de la carte déclenche automatiquement l'aperçu audio. Aucun clic requis. En même temps, une *rich card* apparaît à côté de la carte — une bulle flottante qui affiche le titre, un extrait du texte, une citation biblique, et une phrase d'invitation à lire l'histoire.
+
+**Sur mobile :** une icône ♪ apparaît sur la couverture. Un tap joue l'audio et fait apparaître une *bottom sheet* — un panneau qui monte depuis le bas de l'écran avec le même contenu que la rich card desktop. Un tap sur l'overlay referme le panneau.
+
+La rich card se positionne intelligemment selon l'espace disponible à l'écran (droite, gauche, ou au-dessus) grâce à `getBoundingClientRect`. Elle ne couvre jamais l'image de la carte.
+
+Un seul audio peut jouer à la fois. Un gestionnaire singleton coordonne les transitions entre cartes : si un aperçu est en cours et qu'on survole une autre carte, le premier s'arrête proprement avant que le second commence.
+
+### Cartes "À venir" — animation dorée et chain audio
+
+Pour les livres à venir, l'aperçu audio enchaîne deux fichiers : l'audio spécifique au livre, puis un audio commun "bientôt disponible". Pendant que ce second audio joue, l'overlay de la carte s'illumine en or avec une animation de pulsation — un signal visuel qui accompagne la voix.
+
+### L'icône bibliothèque animée
+
+En haut de la section bibliothèque, une icône livre SVG anime en bounce (flottement vertical continu). Au survol ou au tap, elle joue un audio d'introduction à la bibliothèque, et une bulle "Bibliothèque" apparaît au-dessus. Pendant la lecture, l'animation s'arrête et une icône ♪ vire au vert. À la fin, tout reprend son état initial.
+
+### Musique d'ambiance — architecture respectueuse
+
+La v2 intègre une musique de fond, conçue selon les règles UX de la Web Audio API :
+
+- **Pas d'autoplay.** La musique ne démarre jamais sans interaction. Elle se déclenche au premier clic sur le chevron ↓ — quand l'utilisateur entre dans la bibliothèque, symboliquement.
+- **Ducking.** Quand un aperçu audio ou l'audio de bibliothèque joue, la musique baisse automatiquement en douceur. Elle remonte à la fin.
+- **Bouton 🔇/🔊** visible en bas à droite, apparaît dès que la musique démarre.
+- **Mémoire.** Le choix de l'utilisateur (coupé ou non) est sauvegardé en localStorage. Si l'utilisateur a coupé le son, il ne redémarre jamais sans qu'il le demande.
+- **Fade in/out.** Pas de démarrage brutal — la musique monte progressivement sur 2-3 secondes.
+
+### UX mobile — carte suivante visible
+
+Sur mobile, la grille n'affiche qu'une carte par ligne. Un padding-bottom de 120px fait dépasser légèrement le haut de la carte suivante en bas de l'écran — indiquant instinctivement qu'il y a plus à découvrir en scrollant.
+
+### Technique
+
+- Stack : Next.js 16, React 19, Tailwind CSS v4, TypeScript strict
+- Déploiement : Vercel
+- Architecture audio : CustomEvents cross-composants (`biblefon:stop-lib`, `biblefon:preview-stop`, `biblefon:chain-start`, etc.)
+- Trick autoplay : `audio.muted = true → play() → muted = false` — compatible tous navigateurs mobiles
+- Audios produits : `david-preview.wav`, `fournaise-preview.wav`, `noe-preview.wav`, `bientotdisponible.wav`, `bibliotheque.wav`, musique d'ambiance
+
+---
+
 ## Le chemin parcouru
 
 Je suis béninois. J'ai fait ma licence en génie logiciel à l'IFRI, à Cotonou. Puis je suis venu en France, à l'ESGI Paris, pour un bachelor en ingénierie web.

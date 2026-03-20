@@ -18,6 +18,12 @@ export type PageContent =
   | { type: "mixed"; image: string; caption: string; body: string; fonText?: string; imgPosition?: string; audioFiles?: AudioFile[] }
   | { type: "quote"; verse: string; reference: string; fonText?: string }
 
+export interface PreviewCard {
+  intro:   string
+  quote?:  string
+  closing: string
+}
+
 export interface Book {
   id: string
   title: string
@@ -30,6 +36,7 @@ export interface Book {
   accentColor: string
   testament: "ancien" | "nouveau"
   comingSoon?: boolean
+  previewCard?: PreviewCard
 }
 
 export const books: Book[] = [
@@ -44,6 +51,11 @@ export const books: Book[] = [
     ageRange: "6 – 12 ans",
     accentColor: "#c9922a",
     testament: "ancien",
+    previewCard: {
+      intro:   "Aux yeux de tous, ce n'était qu'un enfant. Mais DIEU lui-même a rendu témoignage :",
+      quote:   "« J'ai trouvé David, fils d'Isaï, homme selon mon cœur, qui accomplira toutes mes volontés. »",
+      closing: "Voici son histoire.",
+    },
     pages: [
       {
         type: "title",
@@ -236,6 +248,10 @@ export const books: Book[] = [
     accentColor: "#e05a1b",
     testament: "ancien",
     comingSoon: true,
+    previewCard: {
+      intro:   "N'avons-nous pas jeté au milieu du feu trois hommes liés? Eh bien, je vois quatre hommes sans liens, qui marchent au milieu du feu, et qui n'ont point de mal; et la figure du quatrième ressemble à celle d'un fils des dieux.",
+      closing: "Voici l'histoire de Daniel, Hanania, Mischaël et Azaria, serviteurs du Dieu suprême.",
+    },
     pages: [],
   },
   {
@@ -250,6 +266,10 @@ export const books: Book[] = [
     accentColor: "#2a7fbf",
     testament: "ancien",
     comingSoon: true,
+    previewCard: {
+      intro:   "C'est l'histoire de Noé. Dieu voulut détruire la terre. Il prévint Noé. Noé crut et obéit à DIEU en construisant une arche. Ils furent ainsi sauvés, lui et sa famille.",
+      closing: "",
+    },
     pages: [],
   },
 ]

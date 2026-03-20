@@ -3,6 +3,7 @@
 export function ScrollChevron() {
   const scrollToLibrary = () => {
     document.getElementById("bibliotheque")?.scrollIntoView({ behavior: "smooth" })
+    window.dispatchEvent(new CustomEvent("biblefon:chevron-click"))
   }
 
   return (

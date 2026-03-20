@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Lora, Inter } from "next/font/google"
 import "./globals.css"
 import { PwaRegistrar } from "./_components/PwaRegistrar"
+import { AmbientPlayer } from "./_components/AmbientPlayer"
 
 const inter = Inter({
   variable: "--font-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({
     <html lang="fr-BJ" className={`${inter.variable} ${lora.variable}`}>
       <body className="antialiased">
         <PwaRegistrar />
+        <AmbientPlayer />
         {children}
       </body>
     </html>
