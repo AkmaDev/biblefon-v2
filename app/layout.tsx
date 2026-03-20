@@ -57,11 +57,36 @@ export const metadata: Metadata = {
   },
 }
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "BibleFon",
+  url: "https://biblefon.org",
+  description: "Histoires bibliques illustrées, racontées en langue fon. Pour les enfants du Bénin et de la diaspora.",
+  inLanguage: ["fr", "fon"],
+  publisher: {
+    "@type": "Person",
+    name: "Manassé A. AKPOVI",
+    url: "https://github.com/AkmaDev",
+  },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://biblefon.org/story/{id}",
+    "query-input": "required name=id",
+  },
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr-BJ" className={`${inter.variable} ${lora.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+      </head>
       <body className="antialiased">
         <PwaRegistrar />
         <AmbientPlayer />
