@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { track } from "@vercel/analytics"
 import type { Book, PageContent, WordTimestamp } from "@/lib/books"
 
 /* ─────────────────────────────────────────────────────────────
@@ -91,6 +92,8 @@ export function StoryPlayer({ book }: { book: Book }) {
 
   const audioRef         = useRef<HTMLAudioElement | null>(null)
   const activeWordRef    = useRef<HTMLSpanElement | null>(null)
+  const trackedPlayRef   = useRef<number>(-1)   // sceneIdx déjà tracké pour story_audio_play
+  const trackedHalfRef   = useRef<number>(-1)   // sceneIdx déjà tracké pour story_progress_50
 
   const current      = scenes[sceneIdx] ?? scenes[0]
   const total        = scenes.length
@@ -173,7 +176,13 @@ export function StoryPlayer({ book }: { book: Book }) {
   /* ── Audio play avec gestion fine des erreurs ── */
   const tryPlay = useCallback((audio: HTMLAudioElement, src: string) => {
     audio.play()
-      .then(() => setAudioError(false))
+      .then(() => {
+        setAudioError(false)
+        if (trackedPlayRef.current !== sceneIdx) {
+          trackedPlayRef.current = sceneIdx
+          track("story_audio_play", { book_id: book.id, scene_index: sceneIdx })
+        }
+      })
       .catch((err: Error) => {
         if (err.name === "NotAllowedError") {
           // Autoplay bloqué par le navigateur — pas une erreur fichier
@@ -208,10 +217,22 @@ export function StoryPlayer({ book }: { book: Book }) {
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    const onEnded = () => { if (sceneIdx < total - 1) nextScene(); else setIsPlaying(false) }
+    const onEnded = () => {
+      if (sceneIdx < total - 1) nextScene()
+      else { track("story_completed", { book_id: book.id }); setIsPlaying(false) }
+    }
     audio.addEventListener("ended", onEnded)
     return () => audio.removeEventListener("ended", onEnded)
-  }, [sceneIdx, total, nextScene])
+  }, [sceneIdx, total, nextScene, book.id])
+
+  /* ── Tracking jalon 50% ── */
+  useEffect(() => {
+    if (duration <= 0 || currentTime <= 0) return
+    if (currentTime / duration >= 0.5 && trackedHalfRef.current !== sceneIdx) {
+      trackedHalfRef.current = sceneIdx
+      track("story_progress_50", { book_id: book.id })
+    }
+  }, [currentTime, duration, sceneIdx, book.id])
 
   /* ── Media Session ── */
   useEffect(() => {

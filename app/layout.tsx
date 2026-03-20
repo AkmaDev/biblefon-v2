@@ -3,6 +3,8 @@ import { Lora, Inter } from "next/font/google"
 import "./globals.css"
 import { PwaRegistrar } from "./_components/PwaRegistrar"
 import { AmbientPlayer } from "./_components/AmbientPlayer"
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({
   variable: "--font-sans",
@@ -24,6 +26,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://biblefon.org"),
   title: "BibleFon — Histoires Bibliques en Langue Fon",
   description:
     "Histoires bibliques illustrées, racontées en langue fon. Pour les enfants du Bénin et de la diaspora — des récits de foi dans leur langue maternelle.",
@@ -55,6 +58,8 @@ export default function RootLayout({
         <PwaRegistrar />
         <AmbientPlayer />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

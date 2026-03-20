@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Github, Mail, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { track } from "@vercel/analytics"
 
 type Lang = "fr" | "en"
 
@@ -30,7 +31,7 @@ export default function AboutPage() {
           {(["fr", "en"] as Lang[]).map((l) => (
             <button
               key={l}
-              onClick={() => setLang(l)}
+              onClick={() => { setLang(l); track("language_toggle", { to: l }) }}
               className="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all duration-200"
               style={
                 lang === l
@@ -403,6 +404,7 @@ function FrContent() {
         <div className="flex flex-col sm:flex-row gap-3">
           <a
             href="mailto:manasse.akpovi@manasseakpovi.com"
+            onClick={() => track("contact_click", { type: "email" })}
             className="inline-flex items-center gap-3 px-5 py-3 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105"
             style={{ background: "linear-gradient(135deg, var(--gold-dark), var(--gold))", color: "#0c0804" }}
           >
@@ -413,6 +415,7 @@ function FrContent() {
             href="https://github.com/AkmaDev"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("contact_click", { type: "github" })}
             className="inline-flex items-center gap-3 px-5 py-3 rounded-full text-sm font-medium border transition-all duration-200 hover:border-white/30 hover:text-white/85"
             style={{ border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
           >
@@ -760,6 +763,7 @@ function EnContent() {
         <div className="flex flex-col sm:flex-row gap-3">
           <a
             href="mailto:manasse.akpovi@manasseakpovi.com"
+            onClick={() => track("contact_click", { type: "email" })}
             className="inline-flex items-center gap-3 px-5 py-3 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105"
             style={{ background: "linear-gradient(135deg, var(--gold-dark), var(--gold))", color: "#0c0804" }}
           >
@@ -770,6 +774,7 @@ function EnContent() {
             href="https://github.com/AkmaDev"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("contact_click", { type: "github" })}
             className="inline-flex items-center gap-3 px-5 py-3 rounded-full text-sm font-medium border transition-all duration-200 hover:border-white/30 hover:text-white/85"
             style={{ border: "1px solid var(--border)", color: "var(--muted-foreground)" }}
           >

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Clock, Lock } from "lucide-react"
+import { track } from "@vercel/analytics"
 import type { Book } from "@/lib/books"
 
 /* ─────────────────────────────────────────────────────────────
@@ -164,6 +165,7 @@ export function BookCard({ book, index }: BookCardProps) {
   const startPreview = useCallback(() => {
     const chain = book.comingSoon ? "/audio/cards/bientotdisponible.wav" : undefined
     const audio = previewManager.play(book.id, chain)
+    track("book_preview_play", { book_id: book.id, book_title: book.title })
 
     const onPlaying    = () => setIsPlaying(true)
     const onTimeUpdate = () => {
@@ -456,6 +458,7 @@ export function BookCard({ book, index }: BookCardProps) {
       href={`/story/${book.id}`}
       className="group block"
       style={{ animationDelay: `${delay}ms` }}
+      onClick={() => track("book_opened", { book_id: book.id })}
     >
       {inner}
     </Link>

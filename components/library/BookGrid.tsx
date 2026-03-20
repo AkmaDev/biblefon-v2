@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { books } from "@/lib/books"
 import { BookCard } from "./BookCard"
+import { track } from "@vercel/analytics"
 
 /* ── Icône livre animée + audio "Bibliothèque" ── */
 function LibraryIcon() {
@@ -27,6 +28,7 @@ function LibraryIcon() {
   const handleClick = () => {
     if (playing) return
     setPlaying(true)
+    track("library_intro_play")
 
     // Arrêter les previews cartes s'ils tournent
     window.dispatchEvent(new CustomEvent("biblefon:stop-cards"))
