@@ -89,6 +89,7 @@ export function StoryPlayer({ book }: { book: Book }) {
   const [duration, setDuration]       = useState(0)
   const [bgColor, setBgColor]         = useState("#130e07")
   const [isDesktop, setIsDesktop]     = useState(false)
+  const [copied, setCopied]           = useState(false)
 
   const audioRef         = useRef<HTMLAudioElement | null>(null)
   const activeWordRef    = useRef<HTMLSpanElement | null>(null)
@@ -268,6 +269,32 @@ export function StoryPlayer({ book }: { book: Book }) {
   const togglePlay    = () => { if (hasAudio) setIsPlaying(p => !p) }
   const progressRatio = duration > 0 ? currentTime / duration : 0
 
+  /* ── Partage Web Share API ── */
+  const handleShare = async () => {
+    const url = `https://biblefon.org/story/${book.id}`
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: book.titleFon, text: `Écoute cette histoire biblique en langue fon — BibleFon`, url })
+        track("story_shared", { book_id: book.id, method: "web_share" })
+      } catch { /* annulé par l'utilisateur */ }
+    } else {
+      await navigator.clipboard.writeText(url)
+      track("story_shared", { book_id: book.id, method: "clipboard" })
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  /* ── Téléchargement audio de la scène ── */
+  const handleDownload = () => {
+    if (!current?.audioSrc) return
+    const a = document.createElement("a")
+    a.href = current.audioSrc
+    a.download = `biblefon-${book.id}-${sceneIdx + 1}.wav`
+    document.body.appendChild(a); a.click(); document.body.removeChild(a)
+    track("story_audio_downloaded", { book_id: book.id, scene_index: sceneIdx })
+  }
+
   /* ════════════════════════════════════════════════════════
      BLOCS PARTAGÉS
   ════════════════════════════════════════════════════════ */
@@ -344,6 +371,35 @@ export function StoryPlayer({ book }: { book: Book }) {
       <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", flexShrink: 0, fontVariantNumeric: "tabular-nums", background: "rgba(255,255,255,0.08)", padding: "2px 8px", borderRadius: 20 }}>
         {sceneIdx + 1} / {total}
       </span>
+
+      {/* Bouton Partager */}
+      <button
+        onClick={handleShare}
+        aria-label={copied ? "Lien copié !" : "Partager cette histoire"}
+        title={copied ? "Lien copié !" : "Partager"}
+        style={{
+          width: 34, height: 34, borderRadius: "50%",
+          background: copied ? "rgba(45,212,191,0.25)" : "rgba(255,255,255,0.1)",
+          border: copied ? "1px solid rgba(45,212,191,0.5)" : "1px solid rgba(255,255,255,0.12)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: copied ? "#2dd4bf" : "rgba(255,255,255,0.8)",
+          cursor: "pointer", flexShrink: 0,
+          transition: "all 0.2s ease",
+        }}
+      >
+        {copied ? (
+          /* Checkmark */
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ) : (
+          /* Share icon */
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        )}
+      </button>
     </div>
   )
 
@@ -449,6 +505,20 @@ export function StoryPlayer({ book }: { book: Book }) {
             }}>
               <IconNext size={28} />
             </button>
+
+            {/* Bouton télécharger la scène */}
+            <button onClick={handleDownload} disabled={!hasAudio} aria-label="Télécharger ce passage" title="Télécharger ce passage audio" style={{
+              width: 28, height: 28, background: "transparent", border: "none",
+              cursor: hasAudio ? "pointer" : "default",
+              opacity: hasAudio ? 0.6 : 0.2,
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white",
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </button>
           </div>
 
         </div>
@@ -530,6 +600,20 @@ export function StoryPlayer({ book }: { book: Book }) {
               display: "flex", alignItems: "center", justifyContent: "center", color: "white",
             }}>
               <IconNext />
+            </button>
+
+            {/* Bouton télécharger la scène */}
+            <button onClick={handleDownload} disabled={!hasAudio} aria-label="Télécharger ce passage" style={{
+              width: 48, height: 48, background: "transparent", border: "none",
+              cursor: hasAudio ? "pointer" : "default",
+              opacity: hasAudio ? 0.75 : 0.2,
+              display: "flex", alignItems: "center", justifyContent: "center", color: "white",
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
             </button>
           </div>
 

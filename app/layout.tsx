@@ -42,10 +42,18 @@ export const metadata: Metadata = {
     apple: [{ url: "/logo.svg" }],
   },
   openGraph: {
-    title: "BibleFon",
-    description: "Histoires bibliques illustrées en langue fon",
+    title: "BibleFon — Histoires Bibliques en Langue Fon",
+    description:
+      "Histoires bibliques illustrées, racontées en langue fon. Pour les enfants du Bénin et de la diaspora — des récits de foi dans leur langue maternelle.",
     type: "website",
-    images: [{ url: "/logo.svg", width: 320, height: 80, alt: "BibleFon" }],
+    siteName: "BibleFon",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "BibleFon" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BibleFon — Histoires Bibliques en Langue Fon",
+    description: "Histoires bibliques illustrées, racontées en langue fon.",
+    images: ["/opengraph-image"],
   },
 }
 
