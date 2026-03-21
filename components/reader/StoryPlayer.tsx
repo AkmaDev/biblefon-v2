@@ -605,106 +605,21 @@ export function StoryPlayer({ book }: { book: Book }) {
 
           {/* Image / Ending slide — flex:1 */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0, padding: "8px 0" }}>
-            {isEnding ? (
-              /* ── Slide final — palette David : terre chaude + or ── */
-              <div style={{
-                width: "min(100%, calc(100vh - 280px))",
-                aspectRatio: "1 / 1",
-                borderRadius: 16,
-                overflow: "hidden",
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "36px 28px",
-                boxSizing: "border-box",
-                background: "linear-gradient(160deg, #1c1206 0%, #110b03 55%, #0e0901 100%)",
-                transform: isPlaying ? "scale(1)" : "scale(0.95)",
-                transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
-              }}>
-                {/* Halo ambiant doré centré en haut */}
-                <div style={{
-                  position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-                  width: "120%", height: "55%",
-                  background: `radial-gradient(ellipse at 50% 0%, ${book.accentColor}26 0%, transparent 70%)`,
-                  pointerEvents: "none",
-                }} />
-                {/* Halo secondaire bas-gauche — profondeur */}
-                <div style={{
-                  position: "absolute", bottom: 0, left: 0,
-                  width: "60%", height: "40%",
-                  background: "radial-gradient(ellipse at 0% 100%, rgba(139,76,18,0.18) 0%, transparent 70%)",
-                  pointerEvents: "none",
-                }} />
-
-                {/* Label "Fin de l'histoire" */}
-                <p style={{
-                  position: "relative",
-                  margin: "0 0 18px",
-                  fontSize: 9,
-                  letterSpacing: "0.22em",
-                  textTransform: "uppercase",
-                  fontFamily: "var(--font-sans, system-ui, sans-serif)",
-                  color: book.accentColor,
-                  opacity: 0.85,
-                }}>Fin de l&apos;histoire</p>
-
-                {/* Ligne dorée */}
-                <div style={{ width: 36, height: 1, background: book.accentColor, opacity: 0.55, marginBottom: 22 }} />
-
-                {/* Citation principale */}
-                <p style={{
-                  position: "relative",
-                  margin: 0,
-                  fontSize: 16,
-                  fontFamily: "var(--font-serif, Georgia, 'Times New Roman', serif)",
-                  color: "rgba(255,244,224,0.93)",
-                  textAlign: "center",
-                  lineHeight: 1.65,
-                  letterSpacing: "0.005em",
-                }}>
-                  Ce jour-là, tous virent que c&apos;est Dieu qui donne la victoire.
-                </p>
-
-                {/* Séparateur discret */}
-                <div style={{ width: 20, height: 1, background: book.accentColor, opacity: 0.35, margin: "22px 0" }} />
-
-                {/* Sous-titre en italique */}
-                <p style={{
-                  position: "relative",
-                  margin: 0,
-                  fontSize: 12,
-                  fontFamily: "var(--font-serif, Georgia, 'Times New Roman', serif)",
-                  fontStyle: "italic",
-                  color: "rgba(255,220,150,0.55)",
-                  textAlign: "center",
-                  lineHeight: 1.55,
-                }}>
-                  Ce n&apos;est pas la taille, ni la force — c&apos;est le cœur.
-                </p>
-
-                {/* Bordure intérieure — cadre doré subtil */}
-                <div style={{
-                  position: "absolute", inset: 0, borderRadius: 16,
-                  border: `1px solid ${book.accentColor}30`,
-                  pointerEvents: "none",
-                }} />
-              </div>
-            ) : (
-              /* ── Image normale ── */
-              <div style={{
-                width: "min(100%, calc(100vh - 280px))",
-                aspectRatio: "1 / 1",
-                borderRadius: 16,
-                overflow: "hidden",
-                position: "relative",
-                transform: isPlaying ? "scale(1)" : "scale(0.95)",
-                transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
-              }}>
-                {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />}
-              </div>
-            )}
+            {/* Image — cover du livre pour le slide final, illustration pour les autres */}
+            <div style={{
+              width: "min(100%, calc(100vh - 280px))",
+              aspectRatio: "1 / 1",
+              borderRadius: 22,
+              overflow: "hidden",
+              position: "relative",
+              transform: isPlaying ? "scale(1)" : "scale(0.95)",
+              transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
+            }}>
+              {isEnding
+                ? <Image key="ending-cover" src={book.cover} alt="" fill className="object-cover" priority />
+                : displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />
+              }
+            </div>
           </div>
 
           {/* Zone texte mobile — 56px, overflow auto, scrollbar cachée, auto-scroll */}
