@@ -692,7 +692,7 @@ export function StoryPlayer({ book }: { book: Book }) {
                 }} />
               </div>
             ) : (
-              /* ── Image normale — bordure overlay sur l'image ── */
+              /* ── Image normale ── */
               <div style={{
                 width: "min(100%, calc(100vh - 280px))",
                 aspectRatio: "1 / 1",
@@ -703,12 +703,6 @@ export function StoryPlayer({ book }: { book: Book }) {
                 transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
               }}>
                 {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />}
-                {/* Bordure sur l'image — overlay absolue, pointerEvents none */}
-                <div style={{
-                  position: "absolute", inset: 0, borderRadius: 16,
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  pointerEvents: "none",
-                }} />
               </div>
             )}
           </div>
