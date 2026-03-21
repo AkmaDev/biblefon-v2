@@ -609,15 +609,13 @@ export function StoryPlayer({ book }: { book: Book }) {
             <div style={{
               width: "min(100%, calc(100vh - 280px))",
               aspectRatio: "1 / 1",
-              borderRadius: 22,
-              overflow: "hidden",
               position: "relative",
               transform: isPlaying ? "scale(1)" : "scale(0.95)",
               transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
             }}>
               {isEnding
-                ? <Image key="ending-cover" src={book.cover} alt="" fill className="object-cover" priority />
-                : displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />
+                ? <Image key="ending-cover" src={book.cover} alt="" fill style={{ borderRadius: 22, objectFit: "cover" }} priority />
+                : displayImage && <Image key={displayImage} src={displayImage} alt="" fill style={{ borderRadius: 22, objectFit: "contain" }} priority />
               }
             </div>
           </div>
