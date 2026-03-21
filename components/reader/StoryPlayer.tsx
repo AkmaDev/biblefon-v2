@@ -69,6 +69,15 @@ function IconPrev({ size = 24 }: { size?: number }) {
 function IconNext({ size = 24 }: { size?: number }) {
   return <svg viewBox="0 0 24 24" fill="currentColor" width={size} height={size}><path d="M6 18 14.5 12 6 6v12zm10.5-12v12h2V6h-2z" /></svg>
 }
+function IconSpinner({ size = 24 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} style={{ animation: "spin 1s linear infinite" }}>
+      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+        strokeDasharray="40" strokeDashoffset="15" />
+    </svg>
+  )
+}
 
 /* ─────────────────────────────────────────────────────────────
    COMPOSANT PRINCIPAL
@@ -95,6 +104,7 @@ export function StoryPlayer({ book }: { book: Book }) {
   const [sceneIdx, setSceneIdx]       = useState(0)
   const [isPlaying, setIsPlaying]     = useState(true)
   const [audioError, setAudioError]   = useState(false)
+  const [isBuffering, setIsBuffering] = useState(false)
   const [touchStart, setTouchStart]   = useState<number | null>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration]       = useState(0)
@@ -152,6 +162,29 @@ export function StoryPlayer({ book }: { book: Book }) {
     return current?.fonText ? current.fonText.split(/\s+/).filter(Boolean) : []
   }, [current])
 
+  /**
+   * wordFractions — position de début de chaque mot en fraction [0, 1] du temps total.
+   * Pondère les pauses naturelles à la ponctuation pour que le surlignage
+   * ralentisse aux virgules/points et reste aligné avec la prosodie.
+   */
+  const wordFractions = useMemo(() => {
+    if (current?.wordTimestamps?.length) return null  // timestamps exacts disponibles
+    if (words.length === 0) return null
+    // Poids additionnel après ponctuation (en fraction d'un mot supplémentaire)
+    const PAUSES: Record<string, number> = {
+      ",": 0.5, ";": 0.7, ":": 0.6,
+      ".": 1.2, "!": 1.2, "?": 1.2, "»": 0.4,
+    }
+    const weights = words.map(w => 1 + (PAUSES[w.slice(-1)] ?? 0))
+    const total   = weights.reduce((s, w) => s + w, 0)
+    let cum = 0
+    return words.map((_, i) => {
+      const f = cum / total
+      cum += weights[i]
+      return f
+    })
+  }, [words, current])
+
   const currentWordIdx = useMemo(() => {
     if (current?.wordTimestamps?.length) {
       const wts = current.wordTimestamps
@@ -159,32 +192,50 @@ export function StoryPlayer({ book }: { book: Book }) {
         currentTime >= w.start && (i === wts.length - 1 || currentTime < wts[i + 1].start)
       )
     }
-    return duration > 0
-      ? Math.min(Math.floor((currentTime / duration) * words.length), words.length - 1)
-      : -1
-  }, [current, currentTime, duration, words.length])
+    if (!wordFractions || duration <= 0) return -1
+    const frac = currentTime / duration
+    // Dernier mot dont la fraction de départ est ≤ frac courant
+    let idx = -1
+    for (let i = 0; i < wordFractions.length; i++) {
+      if (frac >= wordFractions[i]) idx = i
+      else break
+    }
+    return idx
+  }, [current, currentTime, duration, wordFractions])
 
   /* ── Auto-scroll karaoke — mot actif toujours visible ── */
   useEffect(() => {
     activeWordRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }, [currentWordIdx])
 
-  /* ── Timeupdate ── */
+  /* ── Timeupdate + buffering ── */
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    const onTime = () => setCurrentTime(audio.currentTime)
-    const onMeta = () => setDuration(audio.duration || 0)
+    const onTime     = () => setCurrentTime(audio.currentTime)
+    const onMeta     = () => setDuration(audio.duration || 0)
+    const onStalled  = () => setIsBuffering(true)
+    const onWaiting  = () => setIsBuffering(true)
+    const onPlaying  = () => setIsBuffering(false)
+    const onCanPlay  = () => setIsBuffering(false)
     audio.addEventListener("timeupdate",     onTime)
     audio.addEventListener("loadedmetadata", onMeta)
     audio.addEventListener("durationchange", onMeta)
+    audio.addEventListener("stalled",        onStalled)
+    audio.addEventListener("waiting",        onWaiting)
+    audio.addEventListener("playing",        onPlaying)
+    audio.addEventListener("canplay",        onCanPlay)
     return () => {
       audio.removeEventListener("timeupdate",     onTime)
       audio.removeEventListener("loadedmetadata", onMeta)
       audio.removeEventListener("durationchange", onMeta)
+      audio.removeEventListener("stalled",        onStalled)
+      audio.removeEventListener("waiting",        onWaiting)
+      audio.removeEventListener("playing",        onPlaying)
+      audio.removeEventListener("canplay",        onCanPlay)
     }
   }, [])
-  useEffect(() => { setCurrentTime(0); setDuration(0) }, [sceneIdx])
+  useEffect(() => { setCurrentTime(0); setDuration(0); setIsBuffering(false) }, [sceneIdx])
 
   /* ── Audio play avec gestion fine des erreurs ── */
   const tryPlay = useCallback((audio: HTMLAudioElement, src: string) => {
@@ -503,7 +554,7 @@ export function StoryPlayer({ book }: { book: Book }) {
               display: "flex", alignItems: "center", justifyContent: "center",
               color: hasAudio ? "#1a1208" : "rgba(255,255,255,0.25)",
             }}>
-              {isPlaying ? <IconPause size={28} /> : <IconPlay size={28} />}
+              {isBuffering && isPlaying ? <IconSpinner size={28} /> : isPlaying ? <IconPause size={28} /> : <IconPlay size={28} />}
             </button>
 
             <button onClick={nextScene} disabled={sceneIdx === total - 1} aria-label="Suivant" style={{
@@ -689,7 +740,7 @@ export function StoryPlayer({ book }: { book: Book }) {
               color: hasAudio ? "#1a1208" : "rgba(255,255,255,0.25)",
               boxShadow: hasAudio ? "0 8px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25)" : "none",
             }}>
-              {isPlaying ? <IconPause /> : <IconPlay />}
+              {isBuffering && isPlaying ? <IconSpinner size={28} /> : isPlaying ? <IconPause /> : <IconPlay />}
             </button>
 
             <button onClick={nextScene} disabled={sceneIdx === total - 1} aria-label="Suivant" style={{
