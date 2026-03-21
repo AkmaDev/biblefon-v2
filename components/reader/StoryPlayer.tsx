@@ -543,16 +543,13 @@ export function StoryPlayer({ book }: { book: Book }) {
           {/* Image — flex:1, carré parfait, ombre triple couche */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0, padding: "8px 0" }}>
             <div style={{
-              width: "min(100%, calc(100vh - 310px))",
+              width: "min(100%, calc(100vh - 280px))",
               aspectRatio: "1 / 1",
-              borderRadius: 22,
+              borderRadius: 16,
               overflow: "hidden",
               position: "relative",
-              boxShadow: `
-                0 40px 100px rgba(0,0,0,0.75),
-                0 16px 40px rgba(0,0,0,0.5),
-                0 4px 10px rgba(0,0,0,0.35)
-              `,
+              background: bgColor,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
               transform: isPlaying ? "scale(1)" : "scale(0.95)",
               transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
             }}>
@@ -560,9 +557,9 @@ export function StoryPlayer({ book }: { book: Book }) {
             </div>
           </div>
 
-          {/* Zone texte mobile — 76px, overflow auto, scrollbar cachée, auto-scroll */}
-          <div style={{ paddingTop: 18, flexShrink: 0 }}>
-            {KaraokeZone(76, 15)}
+          {/* Zone texte mobile — 56px, overflow auto, scrollbar cachée, auto-scroll */}
+          <div style={{ paddingTop: 12, flexShrink: 0 }}>
+            {KaraokeZone(56, 15)}
           </div>
 
           {/* Progress */}
