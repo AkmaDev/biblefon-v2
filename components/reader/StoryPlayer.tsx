@@ -555,7 +555,7 @@ export function StoryPlayer({ book }: { book: Book }) {
           {/* Image / Ending slide — flex:1 */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0, padding: "8px 0" }}>
             {isEnding ? (
-              /* ── Slide final : pas d'image, texte sur fond dégradé ── */
+              /* ── Slide final — palette David : terre chaude + or ── */
               <div style={{
                 width: "min(100%, calc(100vh - 280px))",
                 aspectRatio: "1 / 1",
@@ -566,53 +566,98 @@ export function StoryPlayer({ book }: { book: Book }) {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "32px 24px",
+                padding: "36px 28px",
                 boxSizing: "border-box",
-                background: "radial-gradient(ellipse at 60% 30%, rgba(201,146,42,0.28) 0%, transparent 65%), radial-gradient(ellipse at 30% 70%, rgba(120,80,20,0.22) 0%, transparent 60%), linear-gradient(160deg, #1a1005 0%, #0d0a04 100%)",
-                border: "1px solid rgba(201,146,42,0.25)",
+                background: "linear-gradient(160deg, #1c1206 0%, #110b03 55%, #0e0901 100%)",
                 transform: isPlaying ? "scale(1)" : "scale(0.95)",
                 transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
               }}>
-                {/* Ornement doré */}
-                <div style={{ width: 40, height: 2, background: "rgba(201,146,42,0.6)", borderRadius: 1, marginBottom: 20 }} />
+                {/* Halo ambiant doré centré en haut */}
+                <div style={{
+                  position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+                  width: "120%", height: "55%",
+                  background: `radial-gradient(ellipse at 50% 0%, ${book.accentColor}26 0%, transparent 70%)`,
+                  pointerEvents: "none",
+                }} />
+                {/* Halo secondaire bas-gauche — profondeur */}
+                <div style={{
+                  position: "absolute", bottom: 0, left: 0,
+                  width: "60%", height: "40%",
+                  background: "radial-gradient(ellipse at 0% 100%, rgba(139,76,18,0.18) 0%, transparent 70%)",
+                  pointerEvents: "none",
+                }} />
+
+                {/* Label "Fin de l'histoire" */}
                 <p style={{
+                  position: "relative",
+                  margin: "0 0 18px",
+                  fontSize: 9,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  fontFamily: "var(--font-sans, system-ui, sans-serif)",
+                  color: book.accentColor,
+                  opacity: 0.85,
+                }}>Fin de l&apos;histoire</p>
+
+                {/* Ligne dorée */}
+                <div style={{ width: 36, height: 1, background: book.accentColor, opacity: 0.55, marginBottom: 22 }} />
+
+                {/* Citation principale */}
+                <p style={{
+                  position: "relative",
                   margin: 0,
-                  fontSize: 18,
-                  fontFamily: "var(--font-serif, Georgia, serif)",
-                  color: "rgba(255,255,255,0.92)",
+                  fontSize: 16,
+                  fontFamily: "var(--font-serif, Georgia, 'Times New Roman', serif)",
+                  color: "rgba(255,244,224,0.93)",
                   textAlign: "center",
-                  lineHeight: 1.55,
-                  letterSpacing: "0.01em",
+                  lineHeight: 1.65,
+                  letterSpacing: "0.005em",
                 }}>
                   Ce jour-là, tous virent que c&apos;est Dieu qui donne la victoire.
                 </p>
-                <div style={{ width: 24, height: 2, background: "rgba(201,146,42,0.4)", borderRadius: 1, margin: "20px 0 16px" }} />
+
+                {/* Séparateur discret */}
+                <div style={{ width: 20, height: 1, background: book.accentColor, opacity: 0.35, margin: "22px 0" }} />
+
+                {/* Sous-titre en italique */}
                 <p style={{
+                  position: "relative",
                   margin: 0,
-                  fontSize: 13,
-                  fontFamily: "var(--font-serif, Georgia, serif)",
-                  color: "rgba(201,146,42,0.8)",
+                  fontSize: 12,
+                  fontFamily: "var(--font-serif, Georgia, 'Times New Roman', serif)",
+                  fontStyle: "italic",
+                  color: "rgba(255,220,150,0.55)",
                   textAlign: "center",
-                  lineHeight: 1.5,
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
+                  lineHeight: 1.55,
                 }}>
                   Ce n&apos;est pas la taille, ni la force — c&apos;est le cœur.
                 </p>
+
+                {/* Bordure intérieure — cadre doré subtil */}
+                <div style={{
+                  position: "absolute", inset: 0, borderRadius: 16,
+                  border: `1px solid ${book.accentColor}30`,
+                  pointerEvents: "none",
+                }} />
               </div>
             ) : (
-              /* ── Image normale ── */
+              /* ── Image normale — bordure overlay sur l'image ── */
               <div style={{
                 width: "min(100%, calc(100vh - 280px))",
                 aspectRatio: "1 / 1",
                 borderRadius: 16,
                 overflow: "hidden",
                 position: "relative",
-                border: "1px solid rgba(255,255,255,0.15)",
                 transform: isPlaying ? "scale(1)" : "scale(0.95)",
                 transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
               }}>
                 {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />}
+                {/* Bordure sur l'image — overlay absolue, pointerEvents none */}
+                <div style={{
+                  position: "absolute", inset: 0, borderRadius: 16,
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  pointerEvents: "none",
+                }} />
               </div>
             )}
           </div>

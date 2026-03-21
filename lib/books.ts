@@ -272,9 +272,9 @@ export const books: Book[] = [
         type: "ending",
         title: "Ce jour-là",
         body: "Ce jour-là, tous virent que c'est Dieu qui donne la victoire. Ce n'est pas la taille, ni la force — c'est le cœur.",
-        fonText: "Gbè enɛ gbè ɔ, mɛ bǐ mɔ ɖɔ Mawu Mavɔmavɔ wɛ nɔ ná ɖuɖéjí mɛ. ayixa mɛ wɛ é nɔ kpɔ́n, é nɔ kpɔ́n ayi mɛ wɛ.",
+        fonText: "Gbè enɛ gbè ɔ, mɛ bǐ mɔ ɖɔ Mawu Mavɔmavɔ wɛ nɔ ná ɖuɖéjí mɛ bɔ ayixa mɛ wɛ é nɔ kpɔ́n.",
         audioFiles: [
-          { src: "/audio/david/david-ending/35.wav", fonText: "Gbè enɛ gbè ɔ, mɛ bǐ mɔ ɖɔ Mawu Mavɔmavɔ wɛ nɔ ná ɖuɖéjí mɛ. ayixa mɛ wɛ é nɔ kpɔ́n, é nɔ kpɔ́n ayi mɛ wɛ." },
+          { src: "/audio/david/david-ending/35.wav", fonText: "Gbè enɛ gbè ɔ, mɛ bǐ mɔ ɖɔ Mawu Mavɔmavɔ wɛ nɔ ná ɖuɖéjí mɛ bɔ ayixa mɛ wɛ é nɔ kpɔ́n." },
         ],
       },
       {
