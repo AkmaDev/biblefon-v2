@@ -548,12 +548,11 @@ export function StoryPlayer({ book }: { book: Book }) {
               borderRadius: 16,
               overflow: "hidden",
               position: "relative",
-              background: bgColor,
-              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              boxShadow: "0 12px 40px rgba(0,0,0,0.45)",
               transform: isPlaying ? "scale(1)" : "scale(0.95)",
               transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
             }}>
-              {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />}
+              {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-cover" priority />}
             </div>
           </div>
 
