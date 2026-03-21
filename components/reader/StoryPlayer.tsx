@@ -614,7 +614,7 @@ export function StoryPlayer({ book }: { book: Book }) {
               transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
             }}>
               {isEnding
-                ? <Image key="ending-cover" src={book.cover} alt="" fill style={{ borderRadius: 22, objectFit: "cover" }} priority />
+                ? <Image key="ending-cover" src="/illustrations/david/4couverture.jpg" alt="" fill style={{ borderRadius: 22, objectFit: "cover" }} priority />
                 : displayImage && <Image key={displayImage} src={displayImage} alt="" fill style={{ borderRadius: 22, objectFit: "contain" }} priority />
               }
             </div>
