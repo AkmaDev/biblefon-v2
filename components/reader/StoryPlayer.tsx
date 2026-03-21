@@ -360,9 +360,6 @@ export function StoryPlayer({ book }: { book: Book }) {
       </Link>
 
       <div style={{ flex: 1, textAlign: "center", overflow: "hidden" }}>
-        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", color: "#c8a040", marginBottom: 1, fontFamily: "var(--font-serif, Georgia, serif)" }}>
-          {book.titleFon}
-        </p>
         <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "white", fontFamily: "var(--font-serif, Georgia, serif)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {book.title}
         </p>
@@ -546,7 +543,7 @@ export function StoryPlayer({ book }: { book: Book }) {
           {/* Image — flex:1, carré parfait, ombre triple couche */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0, padding: "8px 0" }}>
             <div style={{
-              width: "min(100%, calc(100vh - 390px))",
+              width: "min(100%, calc(100vh - 310px))",
               aspectRatio: "1 / 1",
               borderRadius: 22,
               overflow: "hidden",
@@ -572,7 +569,7 @@ export function StoryPlayer({ book }: { book: Book }) {
           <div style={{ paddingTop: 14, flexShrink: 0 }}>{ProgressBar}</div>
 
           {/* Contrôles */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 20, paddingBottom: "max(40px, 20px)", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 32, paddingTop: 20, paddingBottom: "max(40px, 20px)", flexShrink: 0 }}>
             <button onClick={prevScene} disabled={sceneIdx === 0} aria-label="Précédent" style={{
               width: 48, height: 48, background: "transparent", border: "none",
               cursor: sceneIdx === 0 ? "default" : "pointer",
@@ -602,14 +599,14 @@ export function StoryPlayer({ book }: { book: Book }) {
               <IconNext />
             </button>
 
-            {/* Bouton télécharger la scène */}
+            {/* Bouton télécharger la scène — discret */}
             <button onClick={handleDownload} disabled={!hasAudio} aria-label="Télécharger ce passage" style={{
-              width: 48, height: 48, background: "transparent", border: "none",
+              width: 40, height: 40, background: "transparent", border: "none",
               cursor: hasAudio ? "pointer" : "default",
-              opacity: hasAudio ? 0.75 : 0.2,
+              opacity: hasAudio ? 0.45 : 0.15,
               display: "flex", alignItems: "center", justifyContent: "center", color: "white",
             }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
