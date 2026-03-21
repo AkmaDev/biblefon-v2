@@ -17,6 +17,7 @@ export type PageContent =
   | { type: "image"; src: string; alt?: string }
   | { type: "mixed"; image: string; caption: string; body: string; fonText?: string; imgPosition?: string; audioFiles?: AudioFile[] }
   | { type: "quote"; verse: string; reference: string; fonText?: string }
+  | { type: "ending"; title: string; body: string; fonText?: string; audioFiles?: AudioFile[] }
 
 export interface PreviewCard {
   intro:   string
@@ -224,8 +225,57 @@ export const books: Book[] = [
         ],
       },
       {
-        type: "text",
-        body: "À suivre...",
+        type: "mixed",
+        image: "/illustrations/david/david-goliath-v1.jpg",
+        imgPosition: "top",
+        caption: "L'affrontement",
+        body: "Goliath, le Philistin, regardait David avec mépris. Quand il vit que David n'était qu'un jeune garçon, il dit : « Viens par ici et je donnerai ta chair aux oiseaux du ciel et aux bêtes des champs ! »",
+        fonText: "Filisitɛ́ɛn ɔ́ jɛ sisɛkpɔ́ Davídi jí kpɛɖé kpɛɖé. Ée Filisitɛ́ɛn ɔ́ mɔ Davídi sɛ́ dó ɔ́, é hu tɛ́ n'i, ɖó é ɔ́ kpɛví, bó nyɔ nyinya wɛ bo nyi. Filisitɛ́ɛn ɔ́ ɖɔ nú Davídi: Ma wá gɔ́n mì bó sú bò fí, bó xo gbɛ́nɔ mì. Wá fí, bɔ un ná ná nɔ ta towe nú winyin, bó ná ná nɔ hán towe nú sɔ́tɔ́.",
+        audioFiles: [
+          { src: "/audio/david/david-goliath-v1/31.wav", fonText: "Filisitɛ́ɛn ɔ́ jɛ sisɛkpɔ́ Davídi jí kpɛɖé kpɛɖé. Ée Filisitɛ́ɛn ɔ́ mɔ Davídi sɛ́ dó ɔ́, é hu tɛ́ n'i, ɖó é ɔ́ kpɛví, bó nyɔ nyinya wɛ bo nyi. Filisitɛ́ɛn ɔ́ ɖɔ nú Davídi: Ma wá gɔ́n mì bó sú bò fí, bó xo gbɛ́nɔ mì. Wá fí, bɔ un ná ná nɔ ta towe nú winyin, bó ná ná nɔ hán towe nú sɔ́tɔ́." },
+        ],
+      },
+      {
+        type: "mixed",
+        image: "/illustrations/david/david-goliath-v2.jpg",
+        imgPosition: "top",
+        caption: "La réponse de David",
+        body: "David répondit au Philistin : « Tu viens à moi avec une épée, une lance et un javelot ; mais moi, je viens à toi au nom de l'Éternel des armées, du Dieu des armées d'Israël, que tu as outragées ! »",
+        fonText: "Davídi ka ɖɔ nú Filisitɛ́ɛn ɔ́ ɖɔ: Hwɛ ɔ́, a hɛn hwǐ bó hɛn hwǎn kpɛví bó wá gɔ́n mì; mɔ̌ wiwa nɛ. Mawu Mavɔmavɔ sín nyikɔ mɛ wɛ un wá gɔ́n we, nyikɔ Mawu ahwangɔnu Izlayɛ́li tɔn lɛ́ɛ sín, mɛ e a ɖi kpɔ́n dó wu tɔn ɔ́.",
+        audioFiles: [
+          { src: "/audio/david/david-goliath-v2/32.wav", fonText: "Davídi ka ɖɔ nú Filisitɛ́ɛn ɔ́ ɖɔ: Hwɛ ɔ́, a hɛn hwǐ bó hɛn hwǎn kpɛví bó wá gɔ́n mì; mɔ̌ wiwa nɛ. Mawu Mavɔmavɔ sín nyikɔ mɛ wɛ un wá gɔ́n we, nyikɔ Mawu ahwangɔnu Izlayɛ́li tɔn lɛ́ɛ sín, mɛ e a ɖi kpɔ́n dó wu tɔn ɔ́." },
+        ],
+      },
+      {
+        type: "mixed",
+        image: "/illustrations/david/david-lance-pierre.jpg",
+        imgPosition: "top",
+        caption: "La fronde",
+        body: "Le Philistin se leva et marcha à la rencontre de David. David courut rapidement vers lui. Il mit sa main dans sa gibecière, prit une pierre, et la lança avec sa fronde. La pierre atteignit le Philistin au front et il tomba face contre terre.",
+        fonText: "Filisitɛ́ɛn ɔ́ xo zǐn, bó ná sɛkpɔ́ Davídi, bɔ Davídi bɛ́ wezun, bo sɛkpɔ́ Filisitɛ́ɛn ɔ́ gɔ́n. É sɔ́ kɛ́n ɖokpó ɖo gló tɔn mɛ, bo flin lɛngbɔ́ tɔn, bó xan Filisitɛ́ɛn ɔ́ sín dɔ xwé jí, bɔ é jɛ afɔ wlí jí.",
+        audioFiles: [
+          { src: "/audio/david/david-lance-pierre/33.wav", fonText: "Filisitɛ́ɛn ɔ́ xo zǐn, bó ná sɛkpɔ́ Davídi, bɔ Davídi bɛ́ wezun, bo sɛkpɔ́ Filisitɛ́ɛn ɔ́ gɔ́n. É sɔ́ kɛ́n ɖokpó ɖo gló tɔn mɛ, bo flin lɛngbɔ́ tɔn, bó xan Filisitɛ́ɛn ɔ́ sín dɔ xwé jí, bɔ é jɛ afɔ wlí jí." },
+        ],
+      },
+      {
+        type: "mixed",
+        image: "/illustrations/david/david-vainqueur.jpg",
+        imgPosition: "top",
+        caption: "La victoire",
+        body: "Ainsi David triompha du Philistin avec une fronde et une pierre ; il abattit le Philistin et le fit mourir, sans avoir d'épée à la main. Il prit l'épée du Philistin, le tua, et lui coupa la tête.",
+        fonText: "Lě e Davídi ɖu ɖo Filisitɛ́ɛn ɔ́ jí gbɔn ɔ́ nɛ́; klohwán kpó awǐnnya kpó ǎ. É sɔ́ hwǐ Filisitɛ́ɛn ɔ́ tɔn, bo ɖó xwé ɖo kan tɔn mɛ, bo vɔ́sɔ́ ta tɔn.",
+        audioFiles: [
+          { src: "/audio/david/david-vainqueur/34.wav", fonText: "Lě e Davídi ɖu ɖo Filisitɛ́ɛn ɔ́ jí gbɔn ɔ́ nɛ́; klohwán kpó awǐnnya kpó ǎ. É sɔ́ hwǐ Filisitɛ́ɛn ɔ́ tɔn, bo ɖó xwé ɖo kan tɔn mɛ, bo vɔ́sɔ́ ta tɔn." },
+        ],
+      },
+      {
+        type: "ending",
+        title: "Ce jour-là",
+        body: "Ce jour-là, tous virent que c'est Dieu qui donne la victoire. Ce n'est pas la taille, ni la force — c'est le cœur.",
+        fonText: "Gbè enɛ gbè ɔ, mɛ bǐ mɔ ɖɔ Mawu Mavɔmavɔ wɛ nɔ ná ɖuɖéjí mɛ. ayixa mɛ wɛ é nɔ kpɔ́n, é nɔ kpɔ́n ayi mɛ wɛ.",
+        audioFiles: [
+          { src: "/audio/david/david-ending/35.wav", fonText: "Gbè enɛ gbè ɔ, mɛ bǐ mɔ ɖɔ Mawu Mavɔmavɔ wɛ nɔ ná ɖuɖéjí mɛ. ayixa mɛ wɛ é nɔ kpɔ́n, é nɔ kpɔ́n ayi mɛ wɛ." },
+        ],
       },
       {
         type: "quote",

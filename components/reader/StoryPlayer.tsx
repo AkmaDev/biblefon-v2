@@ -23,6 +23,17 @@ function buildScenes(pages: PageContent[], tsMap: Record<string, WordTimestamp[]
   const scenes: Scene[] = []
   for (const page of pages) {
     if (page.type === "title" || page.type === "meta") continue
+    if (page.type === "ending") {
+      const audioFiles = page.audioFiles ?? []
+      if (audioFiles.length > 0) {
+        for (const af of audioFiles) {
+          scenes.push({ image: "", fonText: af.fonText, audioSrc: af.src, wordTimestamps: tsMap[af.src] ?? af.words })
+        }
+      } else {
+        scenes.push({ image: "", fonText: page.fonText ?? page.body, audioSrc: null })
+      }
+      continue
+    }
     const image =
       page.type === "mixed" ? page.image :
       page.type === "text"  ? (page.image ?? "") :
@@ -99,7 +110,8 @@ export function StoryPlayer({ book }: { book: Book }) {
   const current      = scenes[sceneIdx] ?? scenes[0]
   const total        = scenes.length
   const hasAudio     = !!current?.audioSrc
-  const displayImage = current?.image || book.cover
+  const isEnding     = current?.image === ""
+  const displayImage = isEnding ? "" : (current?.image || book.cover)
 
   /* ── Détection breakpoint ── */
   useEffect(() => {
@@ -111,7 +123,7 @@ export function StoryPlayer({ book }: { book: Book }) {
 
   /* ── Couleur de fond dynamique ── */
   useEffect(() => {
-    if (!current?.image) return
+    if (!current?.image || isEnding) return
     let cancelled = false
     import("fast-average-color").then(({ FastAverageColor }) => {
       const fac = new FastAverageColor()
@@ -540,19 +552,69 @@ export function StoryPlayer({ book }: { book: Book }) {
             {Header}
           </div>
 
-          {/* Image — flex:1, carré parfait, ombre triple couche */}
+          {/* Image / Ending slide — flex:1 */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0, padding: "8px 0" }}>
-            <div style={{
-              width: "min(100%, calc(100vh - 280px))",
-              aspectRatio: "1 / 1",
-              borderRadius: 16,
-              overflow: "hidden",
-              position: "relative",
-              transform: isPlaying ? "scale(1)" : "scale(0.95)",
-              transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
-            }}>
-              {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />}
-            </div>
+            {isEnding ? (
+              /* ── Slide final : pas d'image, texte sur fond dégradé ── */
+              <div style={{
+                width: "min(100%, calc(100vh - 280px))",
+                aspectRatio: "1 / 1",
+                borderRadius: 16,
+                overflow: "hidden",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "32px 24px",
+                boxSizing: "border-box",
+                background: "radial-gradient(ellipse at 60% 30%, rgba(201,146,42,0.28) 0%, transparent 65%), radial-gradient(ellipse at 30% 70%, rgba(120,80,20,0.22) 0%, transparent 60%), linear-gradient(160deg, #1a1005 0%, #0d0a04 100%)",
+                border: "1px solid rgba(201,146,42,0.25)",
+                transform: isPlaying ? "scale(1)" : "scale(0.95)",
+                transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
+              }}>
+                {/* Ornement doré */}
+                <div style={{ width: 40, height: 2, background: "rgba(201,146,42,0.6)", borderRadius: 1, marginBottom: 20 }} />
+                <p style={{
+                  margin: 0,
+                  fontSize: 18,
+                  fontFamily: "var(--font-serif, Georgia, serif)",
+                  color: "rgba(255,255,255,0.92)",
+                  textAlign: "center",
+                  lineHeight: 1.55,
+                  letterSpacing: "0.01em",
+                }}>
+                  Ce jour-là, tous virent que c&apos;est Dieu qui donne la victoire.
+                </p>
+                <div style={{ width: 24, height: 2, background: "rgba(201,146,42,0.4)", borderRadius: 1, margin: "20px 0 16px" }} />
+                <p style={{
+                  margin: 0,
+                  fontSize: 13,
+                  fontFamily: "var(--font-serif, Georgia, serif)",
+                  color: "rgba(201,146,42,0.8)",
+                  textAlign: "center",
+                  lineHeight: 1.5,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                }}>
+                  Ce n&apos;est pas la taille, ni la force — c&apos;est le cœur.
+                </p>
+              </div>
+            ) : (
+              /* ── Image normale ── */
+              <div style={{
+                width: "min(100%, calc(100vh - 280px))",
+                aspectRatio: "1 / 1",
+                borderRadius: 16,
+                overflow: "hidden",
+                position: "relative",
+                border: "1px solid rgba(255,255,255,0.15)",
+                transform: isPlaying ? "scale(1)" : "scale(0.95)",
+                transition: "transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1)",
+              }}>
+                {displayImage && <Image key={displayImage} src={displayImage} alt="" fill className="object-contain" priority />}
+              </div>
+            )}
           </div>
 
           {/* Zone texte mobile — 56px, overflow auto, scrollbar cachée, auto-scroll */}
